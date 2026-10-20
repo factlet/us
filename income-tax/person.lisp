@@ -68,6 +68,26 @@
   (and (> education-expenses $0) (!= tin 'no-tin) (not aotc-four-years)
        (not less-than-half-time) (not four-years-done) (not drug-felony)))
 
+; A full-time student in some part of 5 months: for the refundable American
+; opportunity credit and the saver's credit.
+(input full-time-student : bool :default false
+  :label "A full-time student for some part of 5 months of the year"
+  :cite "IRC §§25A(i)(5)(B), 25B(c)(2)(B)")
+
+; For the saver's credit (Form 8880), besides traditional IRA contributions.
+(input roth-contributions : usd :default $0
+  :label "Roth IRA and ABLE account contributions for the year" :line 1
+  :cite "IRC §25B(d)(1)(A)")
+(input retirement-distributions : usd :default $0
+  :label "Distributions from IRAs and retirement plans since 2023, through the return's due date, not rolled over"
+  :line 4 :cite "IRC §25B(d)(2)")
+; Not someone under 18 at the end of the year, someone another taxpayer can
+; claim, or a full-time student.
+(def saver-eligible :label "Can take the saver's credit" :cite "IRC §25B(c)"
+  (and (>= (age-on birth-date law/day-after-year-end) 18)
+       (not (and (not is-spouse) claimed-as-dependent))
+       (not full-time-student)))
+
 ; Earned income for the child and dependent care credit and benefits (Form
 ; 2441, lines 4, 5, 18 and 19): this person's own wages and statutory
 ; employee income, and self-employment less the half of its tax deducted.

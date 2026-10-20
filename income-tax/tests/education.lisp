@@ -47,7 +47,7 @@
 
 (test "none refundable under 24 when supported like a dependent, with a parent alive"
   (given filing-status 'single you/birth-date 2004-06-01 you/tin 'ssn
-         you/education-expenses $4,000 full-time-student true supported true)
+         you/education-expenses $4,000 you/full-time-student true supported true)
   (member w2s cafe (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f8863/young-student true

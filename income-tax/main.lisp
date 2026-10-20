@@ -36,10 +36,8 @@
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
 ; For whether your American opportunity credit can be refundable (Form 8863,
-; line 7): not if you're under 24 and supported much like a dependent.
-(input full-time-student : bool :default false
-  :label "You were a full-time student for some part of 5 months of the year"
-  :cite "IRC §25A(i)(5)(B)")
+; line 7): not if you're under 24 and supported much like a dependent, such
+; as a full-time student (`you/full-time-student`).
 (input supported : bool :default false
   :label "Your earned income was less than half of your own support"
   :cite "IRC §25A(i)(5)(B), §1(g)(2)(A)")
@@ -152,7 +150,10 @@
   (input ss-withheld : usd :label "Social security tax withheld" :line 4)
   (input medicare-wages : usd :label "Medicare wages and tips" :line 5)
   (input medicare-withheld : usd :label "Medicare tax withheld" :line 6)
-  (input dependent-care : usd :default $0 :label "Dependent care benefits" :line 10))
+  (input dependent-care : usd :default $0 :label "Dependent care benefits" :line 10)
+  (input deferrals : usd :default $0
+    :label "Elective deferrals to a 401(k) or other plan (box 12, codes D, E, F, G, S, AA, BB, EE)"
+    :line 12))
 
 (collection f1099-ints :label "Forms 1099-INT"
   (input interest : usd :label "Interest income" :line 1)
@@ -244,6 +245,7 @@
 (module f1040s8 (include "forms/f1040s8.lisp"))
 (module f2441 (include "forms/f2441.lisp"))
 (module f8863 (include "forms/f8863.lisp"))
+(module f8880 (include "forms/f8880.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))

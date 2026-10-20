@@ -164,6 +164,17 @@
 (def education-phaseout-range :cite "IRC §25A(d), (i)(4)"
   (table filing-status married-joint $20,000 else $10,000))
 
+; The saver's credit: 50%, 20% or 10% of up to $2,000 of each spouse's
+; retirement savings, the rate by AGI up to each top in turn, and none past
+; the last.
+(def savers-limit :cite "IRC §25B(a)" $2,000)
+(def savers-rates :cite "IRC §25B(b)(1)" [50% 20% 10%])
+(def savers-tops :cite "IRC §25B(b); Notice 2024-80"
+  (table filing-status
+    married-joint     [$47,500 $51,000 $79,000]
+    head-of-household [$35,625 $38,250 $59,250]
+    else              [$23,750 $25,500 $39,500]))
+
 
 (def ctc-per-child :cite "IRC §24(h)(2); P.L. 119-21 §70104" $2,200)
 (def odc-per-dependent :cite "IRC §24(h)(4)" $500)

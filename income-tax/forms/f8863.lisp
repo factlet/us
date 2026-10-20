@@ -43,7 +43,7 @@
 (def age (age-on you/birth-date law/year-end))
 (def young-student :label "Under 24 and supported like a dependent" :cite "IRC §25A(i)(5)(B)"
   (and (not joint) (not parents-deceased) (< age 24)
-       (or (< age 18) (and supported (or (= age 18) full-time-student)))))
+       (or (< age 18) (and supported (or (= age 18) you/full-time-student)))))
 (def line8 :label "Refundable American opportunity credit" :cite "IRC §25A(i)(5)"
   (if (or (= line7 $0) young-student) $0 (* law/aotc-refundable-rate line7)))
 

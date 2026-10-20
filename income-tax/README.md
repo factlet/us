@@ -22,7 +22,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -141,6 +141,11 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   20% of up to $10,000 on the return. Both phase out from $80,000
   ($160,000 joint), and aren't for a separate return or someone another
   taxpayer can claim.
+- Form 8880: the saver's credit, 50%, 20% or 10% by AGI of up to $2,000
+  of each spouse's IRA contributions and elective deferrals, less
+  distributions since 2023; not for someone under 18, a full-time
+  student, or someone another taxpayer can claim. Schedule 3's credits
+  come in the form's order, each limited by the tax the ones before leave.
 - The earned income credit (line 27a): EIC Worksheets A and B, with the EIC
   Table's credit at the midpoint of each $50 row, and Steps 1–4 of the
   instructions for who can take it. That covers a valid SSN for every
@@ -164,9 +169,11 @@ These give wrong answers for returns they affect, so they come first:
   461) aren't applied. A home office is only by the simplified method, not
   Form 8829, and limited by the business's profit as though all of its
   income came from the home.
-- Roth IRA contributions aren't asked about, though they share the
-  traditional IRA's limit, and nondeductible traditional contributions
-  aren't carried to Form 8606.
+- Roth IRA contributions, asked for the saver's credit, don't reduce the
+  traditional IRA's limit they share, and nondeductible traditional
+  contributions aren't carried to Form 8606. The saver's credit counts a
+  spouse's distributions in both columns even from a year you didn't
+  file jointly.
 - A child who is your qualifying child for the EIC but not your dependent
   isn't counted: one you released to the other parent (Form 8332), or one
   who provided over half their own support.
@@ -216,12 +223,11 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule 3: the saver's credit (Form 8880)
-2. Form 8962, the premium tax credit
-3. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-4. Form 8995, the qualified business income deduction
-5. An EIC qualifying child who isn't your dependent (Form 8332)
-6. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Form 8962, the premium tax credit
+2. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+3. Form 8995, the qualified business income deduction
+4. An EIC qualifying child who isn't your dependent (Form 8332)
+5. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-7. Form 8615 (kiddie tax) and Form 6251 (AMT)
-8. Tax year 2026 (Rev. Proc. 2025-32)
+6. Form 8615 (kiddie tax) and Form 6251 (AMT)
+7. Tax year 2026 (Rev. Proc. 2025-32)
