@@ -4,7 +4,10 @@
 
 (def line1 :label "Taxable income" f1040/line15)
 (def line2 :label "Qualified dividends" f1040/line3a)
-(def line3 :label "Capital gain distributions" f1040/line7a)    ; until Schedule D is modeled
+; Schedule D's net long-term gain, as far as the net gain goes: just the
+; capital gain distributions when they're all there is.
+(def line3 :label "Net capital gain"
+  (max $0 (min f1040sd/line15 f1040sd/line16)))
 (def line4 (+ line2 line3))
 (def line5 :label "Ordinary income" (excess line1 line4))
 (def line6 law/cg-0%-top)

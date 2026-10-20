@@ -19,10 +19,10 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040sse`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040sd`, `f1040sse`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -56,7 +56,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 ## Modeled so far
 
 - Form 1040 lines 1a–37 for wages, taxable and tax-exempt interest,
-  dividends and capital gain distributions, business income, IRA
+  dividends, capital gains and losses, business income, IRA
   distributions, pensions and annuities, social security benefits, unemployment compensation,
   withholding, and refunds or amounts owed.
 - Form 1099-R: IRA distributions (lines 4a, 4b) and pensions and annuities
@@ -68,6 +68,10 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   85% over the adjusted base amount, counting tax-exempt interest toward
   them. The base amounts are zero for married filing separately, unless
   the spouses lived apart all year.
+- Schedule D and Form 8949: short- and long-term sales, netted with last
+  year's loss carryovers and capital gain distributions, a net loss
+  limited to $3,000 ($1,500 on a separate return), and the net long-term
+  gain taxed at the capital gain rates.
 - Schedule C for each business: income, cost of goods sold, the Part II
   expenses, and a home office by the simplified method ($5 a square foot
   of up to 300), with its net profit or loss on Schedule 1 line 3.
@@ -159,6 +163,10 @@ These give wrong answers for returns they affect, so they come first:
   when the spouse has no HSA. Excess contributions (Form 5329), excess
   employer contributions, Archer MSAs, IRA funding distributions and
   Part III (the testing period) aren't modeled.
+- Schedule D has no 28% rate gain (collectibles, section 1202 stock) or
+  unrecaptured section 1250 gain, so no Schedule D Tax Worksheet; no gains
+  from Forms 4797, 6252 or Schedules K-1; and doesn't figure the loss to
+  carry over to next year.
 - Net investment income leaves out annuities, rents, royalties and
   passive income, and isn't reduced by investment expenses (Form 8960
   Part II). The Additional Medicare Tax leaves out railroad retirement
@@ -173,15 +181,14 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule D and Form 8949
-2. Schedule A, including the separate-return rule of IRC §63(c)(6)
-3. Schedule 3 credits (child care, Form 2441; education, Form 8863;
+1. Schedule A, including the separate-return rule of IRC §63(c)(6)
+2. Schedule 3 credits (child care, Form 2441; education, Form 8863;
    saver's, Form 8880) and Credit Limit Worksheet A
-4. Form 8962, the premium tax credit
-5. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-6. Form 8995, the qualified business income deduction
-7. An EIC qualifying child who isn't your dependent (Form 8332)
-8. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+3. Form 8962, the premium tax credit
+4. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+5. Form 8995, the qualified business income deduction
+6. An EIC qualifying child who isn't your dependent (Form 8332)
+7. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-9. Form 8615 (kiddie tax) and Form 6251 (AMT)
-10. Tax year 2026 (Rev. Proc. 2025-32)
+8. Form 8615 (kiddie tax) and Form 6251 (AMT)
+9. Tax year 2026 (Rev. Proc. 2025-32)

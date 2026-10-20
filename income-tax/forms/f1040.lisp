@@ -23,8 +23,9 @@
 ; With no benefits, or repayments over them, none are taxable.
 (def line6b :label "Taxable social security benefits" :line 6b :cite "IRC §86"
   (if (> line6a $0) f1040-ssb/line18 $0))
-; Capital gain distributions alone need no Schedule D.
-(def line7a :label "Capital gain" :line 7a (sum f1099-divs cap-gain))
+; Schedule D's net gain, or its net loss up to the limit.
+(def line7a :label "Capital gain or loss" :line 7a
+  (if (>= f1040sd/line16 $0) f1040sd/line16 f1040sd/line21))
 (def line8 :label "Additional income from Schedule 1" :line 8 f1040s1/line10)
 (def line9 :label "Total income" :line 9
   (+ line1z line2b line3b line4b line5b line6b line7a line8))
@@ -65,7 +66,7 @@
                       law/brackets)))
 
 (def line16 :label "Tax" :line 16 :cite "IRC §1"
-  (if (and (= line3a $0) (= line7a $0)) (tax-on line15) f1040-qdcg/line25))
+  (if (= f1040-qdcg/line4 $0) (tax-on line15) f1040-qdcg/line25))  ; any qualified dividends or net capital gain
 (def line18 :line 18 line16)                                      ; + 17
 (def line19 :label "Child tax credit or credit for other dependents" :line 19
   f1040s8/line14)
@@ -79,7 +80,7 @@
 (def line25a :label "Withholding from Forms W-2" :line 25a (sum w2s withheld))
 (def line25b :label "Withholding from Forms 1099" :line 25b
   (+ (sum f1099-ints withheld) (sum f1099-divs withheld) (sum f1099-gs withheld)
-     (sum f1099-rs withheld) (sum ssa1099s withheld)))
+     (sum f1099-bs withheld) (sum f1099-rs withheld) (sum ssa1099s withheld)))
 (def line25c :label "Withholding from other forms" :line 25c f8959/line24)
 (def line25d :label "Total withholding" :line 25d (+ line25a line25b line25c))
 ; A credit of zero settles it without asking who can take it, as Worksheet

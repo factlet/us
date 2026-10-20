@@ -20,6 +20,11 @@
 (def ssb-lower-rate :cite "IRC §86(a)(1)" 50%)
 (def ssb-upper-rate :cite "IRC §86(a)(2)" 85%)
 
+; A net capital loss comes off other income up to this each year. Not
+; adjusted for inflation.
+(def capital-loss-limit :cite "IRC §1211(b)(1)"
+  (table filing-status married-separate $1,500 else $3,000))
+
 ; The simplified method for business use of a home, instead of Form 8829.
 ; Neither is adjusted for inflation.
 (def home-office-rate :cite "Rev. Proc. 2013-13" $5)

@@ -123,6 +123,26 @@
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
   (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12))
 
+; Sales of stock and other capital assets, as Forms 1099-B and 1099-DA
+; report them (in 1099-B's boxes here), or any sale without one: each a row
+; of Form 8949.
+(collection f1099-bs :label "Forms 1099-B and 1099-DA"
+  (input proceeds : usd :label "Proceeds" :line 1d)
+  (input cost : usd :label "Cost or other basis" :line 1e)
+  ; Such as a wash sale's disallowed loss (box 1g), added back.
+  (input adjustment : usd :default $0
+    :label "Adjustment to gain or loss (Form 8949, column (g))" :line 1g)
+  (input long-term : bool :label "Long-term: held more than one year" :line 2
+    :cite "IRC §1222")
+  (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
+  (def gain :label "Gain or loss (Form 8949, column (h))" (+ (- proceeds cost) adjustment)))
+
+; From last year's Capital Loss Carryover Worksheet, as positive amounts.
+(input st-loss-carryover : usd :default $0
+  :label "Short-term capital loss carried over from last year" :cite "IRC §1212(b)")
+(input lt-loss-carryover : usd :default $0
+  :label "Long-term capital loss carried over from last year" :cite "IRC §1212(b)")
+
 (collection f1099-gs :label "Forms 1099-G"
   (input unemployment : usd :label "Unemployment compensation" :line 1)
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4))
@@ -176,5 +196,6 @@
 (module f1040s1a (include "forms/f1040s1a.lisp"))
 (module f1040s2 (include "forms/f1040s2.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))
+(module f1040sd (include "forms/f1040sd.lisp"))
 (module f8959 (include "forms/f8959.lisp"))
 (module f8960 (include "forms/f8960.lisp"))
