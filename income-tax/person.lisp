@@ -18,3 +18,11 @@
   (>= (age-on birth-date law/day-after-year-end) 65))
 
 (def boxes :label "Line 12d boxes checked" (+ (if aged 1 0) (if blind 1 0)))
+
+; For the IRA deduction.
+(input retirement-plan : bool :default false
+  :label "Covered by a retirement plan at work or through self-employment (Form W-2, box 13)"
+  :cite "IRC §219(g)(5)")
+(input ira-contributions : usd :default $0
+  :label "Traditional IRA contributions for the year, made by the return's due date"
+  :cite "IRC §219(f)(3)")

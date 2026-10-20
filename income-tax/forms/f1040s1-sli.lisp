@@ -3,7 +3,8 @@
 
 (def line1 :label "Student loan interest paid" (min (sum f1098-es interest) law/sli-max))
 (def line2 :label "Total income" f1040/line9)
-(def line4 :label "Modified adjusted gross income" line2)        ; − 3
+(def line3 :label "Other adjustments" f1040s1/line20)             ; + 11–19 23 25
+(def line4 :label "Modified adjusted gross income" (- line2 line3))
 (def line5 law/sli-phaseout-start)
 (def line6 (excess line4 line5))
 ; The worksheet rounds to at least three places; this takes three.

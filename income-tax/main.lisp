@@ -31,7 +31,8 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
-; Read only on a separate return, for social security benefits.
+; Read only on a separate return, for social security benefits and the
+; IRA deduction.
 (input lived-apart-all-year : bool :default false
   :label "You lived apart from your spouse for all of the year" :line 6d
   :cite "IRC §86(c)(1)(C)")
@@ -146,9 +147,18 @@
 
 (module f1040 (include "forms/f1040.lisp"))
 (module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
-(module f1040-ssb (include "forms/f1040-ssb.lisp"))
+; Taxable social security benefits after the IRA deduction, and before it
+; for figuring the deduction of someone covered by a retirement plan at
+; work (Pub. 590-A, Appendix B, Worksheets 3 and 1).
+(module f1040-ssb
+  (def adjustments f1040s1/line20)                                ; + 11–19 23 25
+  (include "forms/f1040-ssb.lisp"))
+(module p590a-ssb
+  (def adjustments $0)                                            ; + 11–19 23 25
+  (include "forms/f1040-ssb.lisp"))
 (module f1040-eic (include "forms/f1040-eic.lisp"))
 (module f1040s1 (include "forms/f1040s1.lisp"))
+(module f1040s1-ira (include "forms/f1040s1-ira.lisp"))
 (module f1040s1-sli (include "forms/f1040s1-sli.lisp"))
 (module f1040s1a (include "forms/f1040s1a.lisp"))
 (module f1040s2 (include "forms/f1040s2.lisp"))

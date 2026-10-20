@@ -77,3 +77,20 @@
   (expect f1040/line6a -$500
           f1040/line6b $0
           f1040/line9 $40,000))
+
+(test "covered by a plan at work, the IRA deduction sees the benefits taxable before it"
+  ; Pub. 590-A, Appendix B: Worksheet 1 figures the benefits taxable
+  ; without the deduction, Worksheet 2 the deduction, and Worksheet 3 the
+  ; benefits taxable after it.
+  (given filing-status 'single you/birth-date 1962-03-01 you/tin 'ssn
+         you/retirement-plan true you/ira-contributions $8,000)
+  (member w2s acme (given wages $48,000 withheld $0))
+  (member ssa1099s you (given net-benefits $46,000))
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es dependents)
+  ; $4,500 + 85% × ($23,000 + $48,000 − $34,000)
+  (expect p590a-ssb/line18 $35,950
+          f1040s1-ira/line5 $83,950
+          f1040s1/line20 $4,040                      ; 80% × ($89,000 − $83,950)
+          ; $4,500 + 85% × ($23,000 + $48,000 − $4,040 − $34,000)
+          f1040/line6b $32,516
+          f1040/line11a $76,476))

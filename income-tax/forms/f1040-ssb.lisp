@@ -13,9 +13,10 @@
 (def line5 (+ line2 line3 line4))
 ; Line 6 leaves out the student loan interest deduction, whose own
 ; worksheet starts from income that includes these benefits.
+(def line6 :label "Adjustments to income" adjustments)
 (def line7 :label "Modified adjusted gross income plus half the benefits"
   :cite "IRC §86(b)(1), (2)"
-  line5)                                                          ; − 6
+  (excess line5 line6))
 
 ; Married filing separately, having lived together at any time in the
 ; year, the base amounts are zero, which the worksheet takes as skipping

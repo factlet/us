@@ -50,6 +50,27 @@
 
 ; ---- Adjustments to income ----
 
+; Traditional IRA contributions up to the limit, more from age 50. For
+; someone covered by a retirement plan at work, the limit phases out over
+; the range below the end, which differs for someone not covered filing
+; jointly with a spouse who is, and for married filing separately when
+; the spouses lived together.
+(def ira-limit :cite "IRC §219(b)(1)(A), (b)(5)(A); Notice 2024-80" $7,000)
+(def ira-catch-up :cite "IRC §219(b)(5)(B)" $1,000)
+(def ira-phaseout-end :cite "IRC §219(g)(3)(B); Notice 2024-80"
+  (table filing-status
+    (married-joint qualifying-surviving-spouse) $146,000
+    else                                        $89,000))
+(def ira-phaseout-range :cite "IRC §219(g)(2)(A)"
+  (table filing-status
+    (married-joint qualifying-surviving-spouse) $20,000
+    else                                        $10,000))
+(def ira-phaseout-end-spouse-covered :cite "IRC §219(g)(7); Notice 2024-80" $246,000)
+(def ira-phaseout-range-spouse-covered :cite "IRC §219(g)(7)" $10,000)
+(def ira-phaseout-end-together :cite "IRC §219(g)(3)(B)(iii), (g)(4)" $10,000)
+; A limit phased out partly is rounded up to $10, and is at least this.
+(def ira-min-deduction :cite "IRC §219(g)(2)(B), (C)" $200)
+
 ; Student loan interest up to the maximum, reduced in proportion as
 ; modified AGI passes through the range above the start.
 (def sli-max :cite "IRC §221(b)(1)" $2,500)
