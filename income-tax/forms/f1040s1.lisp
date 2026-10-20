@@ -1,15 +1,16 @@
 ; Schedule 1 (2025), Additional Income and Adjustments to Income. So far
-; only unemployment compensation, HSAs, the IRA deduction and the student
-; loan interest deduction.
+; only business income, unemployment compensation, HSAs, the IRA deduction
+; and the student loan interest deduction.
 
 ; ---- Part I: Additional income ----
 
+(def line3 :label "Business income or loss" (sum f1040scs line31))
 (def line7 :label "Unemployment compensation" :cite "IRC §85"
   (sum f1099-gs unemployment))
 (def line8f :label "Income from Form 8889"
   (+ you/f8889/line16 (if joint spouse/f8889/line16 $0)))         ; + Form 8889 line 20
 (def line9 :label "Total other income" line8f)                   ; + 8a–8e 8g–8z
-(def line10 :label "Additional income" (+ line7 line9))          ; + 1 2a 3 4 5 6
+(def line10 :label "Additional income" (+ line3 line7 line9))    ; + 1 2a 4 5 6
 
 ; ---- Part II: Adjustments to income ----
 

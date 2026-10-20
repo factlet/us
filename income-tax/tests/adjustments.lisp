@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 withheld $6,000))
   (member f1098-es lender (given interest $3,000))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s f1040scs dependents)
   (expect f1040s1-sli/line1 $2,500
           f1040s1-sli/line7 0
           f1040/line10 $2,500
@@ -18,7 +18,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $90,000 withheld $0))
   (member f1098-es lender (given interest $2,000))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s f1040scs dependents)
   (expect f1040s1-sli/line4 $90,000
           f1040s1-sli/line7 0.333                    ; $5,000 ÷ $15,000
           f1040s1-sli/line8 $666
@@ -31,7 +31,7 @@
   (given filing-status 'married-joint)
   (member w2s acme (given wages $180,000 withheld $0))
   (member f1098-es lender (given interest $2,500))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s f1040scs dependents)
   (expect f1040s1-sli/line7 0.333                    ; $10,000 ÷ $30,000
           f1040s1-sli/line8 $832.50
           f1040/line10 $1,667.50))
@@ -40,7 +40,7 @@
   (given filing-status 'married-separate)
   (member w2s acme (given wages $30,000 withheld $0))
   (member f1098-es lender (given interest $1,000))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs ssa1099s f1040scs dependents)
   (expect f1040/line10 $0)
   (given filing-status 'single claimed-as-dependent true)
   (expect f1040/line10 $0)
@@ -50,13 +50,13 @@
 (test "with no IRA contribution, the IRA deduction asks nothing"
   (given filing-status 'single)
   (member w2s acme (given wages $50,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1/line20 $0))
 
 (test "not covered by a plan at work: up to $7,000, or $8,000 from 50"
   (given filing-status 'single you/ira-contributions $8,500)
   (member w2s acme (given wages $200,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (given you/birth-date 1990-05-01)
   (expect f1040s1/line20 $7,000)
   (given you/birth-date 1970-06-01)
@@ -66,7 +66,7 @@
 (test "covered by a plan at work, single: phased out from $79,000 to $89,000"
   (given filing-status 'single you/birth-date 1990-05-01
          you/retirement-plan true you/ira-contributions $7,000)
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (member w2s acme (given wages $79,000 withheld $0))
   (expect f1040s1/line20 $7,000)
   (member w2s b (given wages $6,123 withheld $0))
@@ -84,7 +84,7 @@
          you/birth-date 1980-01-01 you/retirement-plan true you/ira-contributions $7,000
          spouse/birth-date 1985-01-01 spouse/ira-contributions $7,000)
   (member w2s acme (given wages $240,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1-ira/line7a $0                      ; past $146,000
           f1040s1-ira/line7b $4,200                  ; 70% × ($246,000 − $240,000)
           f1040s1/line20 $4,200))
@@ -93,7 +93,7 @@
   (given filing-status 'married-separate you/birth-date 1990-05-01
          you/ira-contributions $7,000 spouse/retirement-plan true)
   (member w2s acme (given wages $6,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1-ira/line1a true
           f1040s1/line20 $2,800)                     ; 70% × ($10,000 − $6,000)
   (given lived-apart-all-year true)
@@ -105,7 +105,7 @@
          you/birth-date 1990-05-01 you/ira-contributions $7,000
          spouse/birth-date 1990-05-01 spouse/ira-contributions $7,000)
   (member w2s acme (given wages $10,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1-ira/line12a $7,000
           f1040s1-ira/line12b $3,000
           f1040s1/line20 $10,000))

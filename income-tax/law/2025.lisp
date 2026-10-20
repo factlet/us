@@ -20,6 +20,11 @@
 (def ssb-lower-rate :cite "IRC §86(a)(1)" 50%)
 (def ssb-upper-rate :cite "IRC §86(a)(2)" 85%)
 
+; The simplified method for business use of a home, instead of Form 8829.
+; Neither is adjusted for inflation.
+(def home-office-rate :cite "Rev. Proc. 2013-13" $5)
+(def home-office-area :cite "Rev. Proc. 2013-13" 300)
+
 ; ---- Tax rates ----
 
 ; Each rate applies up to the edge after it.

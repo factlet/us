@@ -146,6 +146,8 @@
 (collection f1098-es :label "Forms 1098-E"
   (input interest : usd :label "Student loan interest received by lender" :line 1))
 
+(include "forms/f1040sc.lisp")
+
 (module law (include "law/2025.lisp"))
 
 (module f1040 (include "forms/f1040.lisp"))
