@@ -7,7 +7,7 @@
   (member w2s acme (given wages $70,000 withheld $4,000))
   (member w2s globex (given wages $50,000 withheld $2,000))
   (member f1099-ints bank (given interest $500))
-  (empty f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents ada (given birth-date 2020-04-01 qualifying-child true tin 'ssn))
   (member dependents bo (given birth-date 2015-09-15 qualifying-child true tin 'ssn))
   (expect f1040/line15 $89,000
@@ -41,7 +41,7 @@
 (test "a filer without a valid SSN gets $500 per child instead of $2,200"
   (given filing-status 'head-of-household you/birth-date 1990-01-01)
   (member w2s acme (given wages $40,000 withheld $3,000))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents kid (given birth-date 2020-01-01 qualifying-child true tin 'ssn))
   (expect f1040s8/line4 ?)                           ; waits on your number
   (given you/tin 'itin)
@@ -88,7 +88,7 @@
          you/birth-date 1980-01-01 you/tin 'ssn
          spouse/birth-date 1980-01-01 spouse/tin 'ssn)
   (member w2s acme (given wages $410,500 withheld $80,000))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents kid (given birth-date 2015-03-01 qualifying-child true tin 'ssn))
   (member dependents teen (given birth-date 2008-06-15 qualifying-child true tin 'ssn))
   (expect f1040s8/line8 $2,700                       ; $2,200 + $500
@@ -102,7 +102,7 @@
 (test "the additional child tax credit refunds what the tax can't absorb"
   (given filing-status 'head-of-household you/birth-date 1995-01-01 you/tin 'ssn)
   (member w2s acme (given wages $25,000 withheld $500))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents kid (given birth-date 2022-05-01 qualifying-child true tin 'ssn))
   (expect f1040/line15 $1,375
           f1040/line16 $139                          ; row middle $1,387.50
@@ -119,7 +119,7 @@
 (test "the additional child tax credit is 15% of earned income over $2,500"
   (given filing-status 'single you/birth-date 1995-01-01 you/tin 'ssn)
   (member w2s acme (given wages $10,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents kid (given birth-date 2022-05-01 qualifying-child true tin 'ssn))
   (expect f1040/line16 $0
           f1040s8/line17 $1,700
@@ -133,7 +133,7 @@
          you/birth-date 1990-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'itin)
   (member w2s acme (given wages $4,000 withheld $0 ss-withheld $248 medicare-withheld $58))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s)
   (member dependents a (given birth-date 2015-03-01 qualifying-child true tin 'ssn))
   (member dependents b (given birth-date 2017-07-01 qualifying-child true tin 'ssn))
   (member dependents c (given birth-date 2020-01-01 qualifying-child true tin 'ssn))

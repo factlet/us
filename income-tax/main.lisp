@@ -116,6 +116,21 @@
   (input unemployment : usd :label "Unemployment compensation" :line 1)
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4))
 
+; Distributions from IRAs, and from pensions, annuities and employer plans
+; such as 401(k)s, told apart by the IRA/SEP/SIMPLE box. Box 2a left blank,
+; or box 2b saying the payer didn't figure it, still has an answer: all of
+; box 1 for a traditional IRA without nondeductible contributions.
+(collection f1099-rs :label "Forms 1099-R"
+  (input gross : usd :label "Gross distribution" :line 1)
+  (input taxable : usd :label "Taxable amount" :line 2a)
+  (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
+  (input early : bool :default false
+    :label "Code 1 in box 7: an early distribution, no known exception" :line 7)
+  (input ira : bool :default false :label "IRA/SEP/SIMPLE")
+  (input rolled-over : usd :default $0
+    :label "Part you rolled over yourself within 60 days" :cite "IRC §402(c), §408(d)(3)")
+  (def taxable-part :label "Taxable part" (excess taxable rolled-over)))
+
 ; Railroad retirement benefits treated as social security (Form RRB-1099,
 ; boxes 5 and 10) go here too.
 (collection ssa1099s :label "Forms SSA-1099"
@@ -136,4 +151,5 @@
 (module f1040s1 (include "forms/f1040s1.lisp"))
 (module f1040s1-sli (include "forms/f1040s1-sli.lisp"))
 (module f1040s1a (include "forms/f1040s1a.lisp"))
+(module f1040s2 (include "forms/f1040s2.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))

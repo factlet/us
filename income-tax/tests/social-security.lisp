@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $24,000))
   (member f1099-ints bank (given interest $10,000))
-  (empty w2s f1099-divs f1099-gs f1098-es dependents)
+  (empty w2s f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040-ssb/line5 $22,000                    ; $12,000 + $10,000
           f1040/line6a $24,000
           f1040/line6b $0
@@ -20,7 +20,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $30,000 withheld $3,000))
   (member w2s acme (given wages $50,000 withheld $2,000))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040-ssb/line9 $40,000                    ; $15,000 + $50,000 − $25,000
           f1040-ssb/line14 $4,500                    ; half of $9,000
           f1040-ssb/line15 $26,350                   ; 85% × $31,000
@@ -41,7 +41,7 @@
   (member ssa1099s you (given net-benefits $18,000))
   (member ssa1099s spouse (given net-benefits $12,000))
   (member f1099-ints bank (given interest $30,000))
-  (empty w2s f1099-divs f1099-gs f1098-es dependents)
+  (empty w2s f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040-ssb/line9 $13,000                    ; $15,000 + $30,000 − $32,000
           f1040-ssb/line11 $1,000
           f1040-ssb/line14 $6,000                    ; half of $12,000
@@ -53,7 +53,7 @@
   (given filing-status 'married-separate you/birth-date 1990-01-01)
   (member ssa1099s you (given net-benefits $10,000))
   (member f1099-ints bank (given interest $2,000))
-  (empty w2s f1099-divs f1099-gs f1098-es dependents)
+  (empty w2s f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040-ssb/line8 $0
           f1040/line6b $5,950)                       ; 85% × ($5,000 + $2,000)
   (given lived-apart-all-year true)
@@ -64,7 +64,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $20,000))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $16,000))
-  (empty w2s f1099-divs f1099-gs f1098-es dependents)
+  (empty w2s f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040-ssb/line5 $26,000                    ; $10,000 + $16,000
           f1040/line6b $500
           f1040/line11a $500))
@@ -73,7 +73,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits -$500))
   (member w2s acme (given wages $40,000 withheld $0))
-  (empty f1099-ints f1099-divs f1099-gs f1098-es dependents)
+  (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es dependents)
   (expect f1040/line6a -$500
           f1040/line6b $0
           f1040/line9 $40,000))

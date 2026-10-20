@@ -13,6 +13,12 @@
   (sum f1099-ints (+ interest treasury-interest)))
 (def line3a :label "Qualified dividends" :line 3a (sum f1099-divs qualified))
 (def line3b :label "Ordinary dividends" :line 3b (sum f1099-divs ordinary))
+; The form leaves 4a and 5a blank when all of a distribution is taxable.
+(def line4a :label "IRA distributions" :line 4a (sum f1099-rs (if ira gross $0)))
+(def line4b :label "Taxable IRA distributions" :line 4b (sum f1099-rs (if ira taxable-part $0)))
+(def line5a :label "Pensions and annuities" :line 5a (sum f1099-rs (if ira $0 gross)))
+(def line5b :label "Taxable pensions and annuities" :line 5b
+  (sum f1099-rs (if ira $0 taxable-part)))
 (def line6a :label "Social security benefits" :line 6a f1040-ssb/line1)
 ; With no benefits, or repayments over them, none are taxable.
 (def line6b :label "Taxable social security benefits" :line 6b :cite "IRC §86"
@@ -21,7 +27,7 @@
 (def line7a :label "Capital gain" :line 7a (sum f1099-divs cap-gain))
 (def line8 :label "Additional income from Schedule 1" :line 8 f1040s1/line10)
 (def line9 :label "Total income" :line 9
-  (+ line1z line2b line3b line6b line7a line8))                   ; + 4b 5b
+  (+ line1z line2b line3b line4b line5b line6b line7a line8))
 (def line10 :label "Adjustments to income from Schedule 1" :line 10 f1040s1/line26)
 (def line11a :label "Adjusted gross income" :line 11a :cite "IRC §62"
   (- line9 line10))
@@ -65,14 +71,15 @@
   f1040s8/line14)
 (def line21 :line 21 line19)                                      ; + 20
 (def line22 :line 22 (excess line18 line21))
-(def line24 :label "Total tax" :line 24 line22)                   ; + 23
+(def line23 :label "Other taxes from Schedule 2" :line 23 f1040s2/line21)
+(def line24 :label "Total tax" :line 24 (+ line22 line23))
 
 ; ---- Payments ----
 
 (def line25a :label "Withholding from Forms W-2" :line 25a (sum w2s withheld))
 (def line25b :label "Withholding from Forms 1099" :line 25b
   (+ (sum f1099-ints withheld) (sum f1099-divs withheld) (sum f1099-gs withheld)
-     (sum ssa1099s withheld)))
+     (sum f1099-rs withheld) (sum ssa1099s withheld)))
 (def line25d :label "Total withholding" :line 25d (+ line25a line25b))  ; + 25c
 ; A credit of zero settles it without asking who can take it, as Worksheet
 ; A stops when line 2 is zero.

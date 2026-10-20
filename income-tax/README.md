@@ -19,10 +19,10 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-gs`, `ssa1099s`, `f1098-es`); and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s8`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040s1-sli` |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040s1-sli` |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -56,8 +56,13 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 ## Modeled so far
 
 - Form 1040 lines 1a–37 for wages, taxable and tax-exempt interest,
-  dividends and capital gain distributions, social security benefits,
-  unemployment compensation, withholding, and refunds or amounts owed.
+  dividends and capital gain distributions, IRA distributions, pensions
+  and annuities, social security benefits, unemployment compensation,
+  withholding, and refunds or amounts owed.
+- Form 1099-R: IRA distributions (lines 4a, 4b) and pensions and annuities
+  (5a, 5b), taxed at the payer's taxable amount less what you rolled over
+  within 60 days, and Schedule 2 line 8, the 10% additional tax on an
+  early distribution coded 1.
 - Taxable social security benefits (line 6b), from the Social Security
   Benefits Worksheet: up to half of the benefits over the base amount, and
   85% over the adjusted base amount, counting tax-exempt interest toward
@@ -97,6 +102,15 @@ These give wrong answers for returns they affect, so they come first:
 - A child who is your qualifying child for the EIC but not your dependent
   isn't counted: one you released to the other parent (Form 8332), or one
   who provided over half their own support.
+- A Form 1099-R is taxed at its box 2a amount less rollovers. There's no
+  Form 8606 for IRA basis or Roth distributions, no Simplified Method for
+  a pension whose payer didn't figure the taxable amount, and no qualified
+  charitable or HSA funding distributions.
+- An early distribution coded 1 always owes the 10% additional tax: the
+  exceptions on Form 5329 aren't asked about, and a SIMPLE IRA's 25% in
+  its first two years (code S) isn't charged.
+- A disability pension received before the minimum retirement age belongs
+  on line 1h as earned income for the EIC, but is taken as a pension.
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -107,22 +121,21 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Pensions and IRA distributions: Form 1099-R (lines 4a–5b)
-2. Schedule 1: the IRA deduction and its worksheet
-3. Form 8889 and the HSA deduction
-4. Schedule C
-5. Schedule SE, self-employment tax and its deduction, and EIC Worksheet B
-6. Schedule 2: additional Medicare tax (Form 8959) and net investment
+1. Schedule 1: the IRA deduction and its worksheet
+2. Form 8889 and the HSA deduction
+3. Schedule C
+4. Schedule SE, self-employment tax and its deduction, and EIC Worksheet B
+5. Schedule 2: additional Medicare tax (Form 8959) and net investment
    income tax (Form 8960)
-7. Schedule D and Form 8949
-8. Schedule A, including the separate-return rule of IRC §63(c)(6)
-9. Schedule 3 credits (child care, Form 2441; education, Form 8863;
+6. Schedule D and Form 8949
+7. Schedule A, including the separate-return rule of IRC §63(c)(6)
+8. Schedule 3 credits (child care, Form 2441; education, Form 8863;
    saver's, Form 8880) and Credit Limit Worksheet A
-10. Form 8962, the premium tax credit
-11. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-12. Form 8995, the qualified business income deduction
-13. An EIC qualifying child who isn't your dependent (Form 8332)
-14. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+9. Form 8962, the premium tax credit
+10. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+11. Form 8995, the qualified business income deduction
+12. An EIC qualifying child who isn't your dependent (Form 8332)
+13. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
     instead of asking for them
-15. Form 8615 (kiddie tax) and Form 6251 (AMT)
-16. Tax year 2026 (Rev. Proc. 2025-32)
+14. Form 8615 (kiddie tax) and Form 6251 (AMT)
+15. Tax year 2026 (Rev. Proc. 2025-32)

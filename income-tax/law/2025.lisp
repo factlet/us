@@ -112,3 +112,9 @@
     else          [$19,104 $50,434 $57,310 $61,555]))
 ; No credit at all once investment income exceeds this.
 (def eic-investment-limit :cite "IRC §32(i); Rev. Proc. 2024-40 §3.06(2)" $11,950)
+
+; ---- Other taxes ----
+
+; On the taxable part of a distribution from an IRA or retirement plan
+; before age 59½, unless an exception applies.
+(def early-distribution-rate :cite "IRC §72(t)(1)" 10%)

@@ -7,7 +7,8 @@
 (def line1 :label "Net benefits" (sum ssa1099s net-benefits))
 (def line2 (* law/ssb-lower-rate line1))
 (def line3 :label "Other income"
-  (+ f1040/line1z f1040/line2b f1040/line3b f1040/line7a f1040/line8))  ; + 4b 5b
+  (+ f1040/line1z f1040/line2b f1040/line3b f1040/line4b f1040/line5b f1040/line7a
+     f1040/line8))
 (def line4 :label "Tax-exempt interest" f1040/line2a)
 (def line5 (+ line2 line3 line4))
 ; Line 6 leaves out the student loan interest deduction, whose own
