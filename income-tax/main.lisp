@@ -32,6 +32,32 @@
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
 
+; No credit for dependents unless every filer has a number by the due date,
+; and none for a child unless a filer has a valid SSN.
+(def filers-have-tins :cite "IRC §24(e)(2)"
+  (and (!= you/tin 'no-tin) (or (not joint) (!= spouse/tin 'no-tin))))
+(def filer-has-ssn :cite "IRC §24(h)(7)(A)(i)"
+  (or you/valid-ssn (and joint spouse/valid-ssn)))
+
+(collection dependents :label "Dependents"
+  (input birth-date : date :label "Date of birth")
+  (input qualifying-child : bool :label "Your qualifying child" :cite "IRC §152(c)")
+  (input tin : tin :label "Identification number issued by the return's due date")
+  ; Someone who isn't can still be a dependent while living in Canada or
+  ; Mexico (IRC §152(b)(3)), but gets neither credit.
+  (input nonresident-alien : bool :default false
+    :label "Not a U.S. citizen, national or resident alien" :cite "IRC §24(c)(2), (h)(4)(B)")
+  ; A child turns 17 on their 17th birthday (Rev. Rul. 2003-72), so one
+  ; born after 2008-12-31 is under 17 at the end of 2025.
+  (def ctc-child :label "Qualifies for the child tax credit" :cite "IRC §24(c), (e), (h)(7)"
+    (and qualifying-child (not nonresident-alien) (< (age-on birth-date law/year-end) 17)
+         (= tin 'ssn) filer-has-ssn filers-have-tins))
+  ; Everyone else with a number, including a child under 17 who misses the
+  ; credit only for want of an SSN.
+  (def odc-dependent :label "Qualifies for the credit for other dependents"
+    :cite "IRC §24(h)(4)"
+    (and (not ctc-child) (not nonresident-alien) (!= tin 'no-tin) filers-have-tins)))
+
 (collection w2s :label "Forms W-2"
   (input wages : usd :label "Wages, tips, other compensation" :line 1)
   (input withheld : usd :label "Federal income tax withheld" :line 2))
@@ -55,3 +81,4 @@
 (module f1040 (include "forms/f1040.lisp"))
 (module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
 (module f1040s1a (include "forms/f1040s1a.lisp"))
+(module f1040s8 (include "forms/f1040s8.lisp"))

@@ -1,7 +1,8 @@
 ; Tax year 2025: the inflation adjustments of Rev. Proc. 2024-40, as
 ; amended by P.L. 119-21 (2025-07-04) for the standard deduction and the
-; new senior deduction.
+; new senior deduction and the child tax credit.
 
+(def year-end 2025-12-31)
 ; Ages "at the end of the year" for rules where a birthday counts a day
 ; early, such as turning 65.
 (def day-after-year-end 2026-01-01)
@@ -52,3 +53,15 @@
 (def senior-phaseout-start :cite "IRC §151(d)(5)(C)(ii)"
   (table filing-status married-joint $150,000 else $75,000))
 (def senior-phaseout-rate :cite "IRC §151(d)(5)(C)(ii)" 6%)
+
+(def ctc-per-child :cite "IRC §24(h)(2); P.L. 119-21 §70104" $2,200)
+(def odc-per-dependent :cite "IRC §24(h)(4)" $500)
+; $50 per $1,000 of modified AGI over the threshold, or fraction thereof.
+(def ctc-phaseout-start :cite "IRC §24(h)(3)"
+  (table filing-status married-joint $400,000 else $200,000))
+(def ctc-phaseout-rate :cite "IRC §24(b)(1)" 5%)
+; The refundable portion: up to this much per child, and 15% of earned
+; income above the floor.
+(def actc-per-child :cite "IRC §24(h)(5); Rev. Proc. 2024-40" $1,700)
+(def actc-earned-floor :cite "IRC §24(h)(6)" $2,500)
+(def actc-rate :cite "IRC §24(d)(1)(B)(i)" 15%)

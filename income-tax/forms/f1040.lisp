@@ -47,6 +47,9 @@
 
 (def line16 :label "Tax" :line 16 :cite "IRC §1"
   (if (and (= line3a $0) (= line7a $0)) (tax-on line15) f1040-qdcg/line25))
+(def line19 :label "Child tax credit or credit for other dependents" :line 19
+  f1040s8/line14)
+(def line24 :label "Total tax" :line 24 (excess line16 line19))
 
 ; ---- Payments ----
 
@@ -54,5 +57,7 @@
 (def line25b :label "Withholding from Forms 1099" :line 25b
   (+ (sum f1099-ints withheld) (sum f1099-divs withheld)))
 (def line25d :label "Total withholding" :line 25d (+ line25a line25b))
-(def line34 :label "Overpaid" :line 34 (excess line25d line16))
-(def line37 :label "Amount you owe" :line 37 (excess line16 line25d))
+(def line28 :label "Additional child tax credit" :line 28 f1040s8/line27)
+(def line33 :label "Total payments" :line 33 (+ line25d line28))
+(def line34 :label "Overpaid" :line 34 (excess line33 line24))
+(def line37 :label "Amount you owe" :line 37 (excess line24 line33))

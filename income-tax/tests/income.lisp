@@ -4,6 +4,7 @@
   (member f1099-ints bank (given interest $1,200 treasury-interest $800 withheld $100))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $500))
   (member f1099-divs fund (given ordinary $1,000 exempt-interest $250))
+  (empty dependents)
   (expect f1040/line2a $750
           f1040/line2b $2,000
           f1040/line3b $1,000
