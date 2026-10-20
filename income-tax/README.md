@@ -22,7 +22,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040sd`, `f1040sse`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -106,7 +106,14 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   Pub. 590-A's Appendix B: its limit uses the benefits taxable before
   it, and the benefits taxable on the return come after it.
 - The standard deduction, with the additions for age and blindness and the
-  limit for someone claimed as a dependent.
+  limit for someone claimed as a dependent, and none when a spouse filing
+  separately itemizes.
+- Schedule A: medical expenses past 7.5% of AGI; state and local taxes up
+  to the 2025 limit of $40,000 ($20,000 on a separate return), coming down
+  past $500,000 of AGI to $10,000 ($5,000); mortgage and investment
+  interest, gifts to charity, disaster losses and other itemized
+  deductions. Itemized instead of the standard deduction when larger, or
+  when chosen.
 - Tax from the Tax Table (the midpoint of each $25 or $50 row) below
   $100,000, the Tax Computation Worksheet from $100,000, and the Qualified
   Dividends and Capital Gain Tax Worksheet.
@@ -163,6 +170,11 @@ These give wrong answers for returns they affect, so they come first:
   when the spouse has no HSA. Excess contributions (Form 5329), excess
   employer contributions, Archer MSAs, IRA funding distributions and
   Part III (the testing period) aren't modeled.
+- Schedule A takes mortgage interest, investment interest and gifts to
+  charity in full: the limit to interest on $750,000 of mortgage debt
+  (Pub. 936), Form 4952's limit to net investment income, and the
+  charitable limits by share of AGI (Pub. 526) aren't applied. A
+  dual-status alien's standard deduction (line 12c) isn't zeroed.
 - Schedule D has no 28% rate gain (collectibles, section 1202 stock) or
   unrecaptured section 1250 gain, so no Schedule D Tax Worksheet; no gains
   from Forms 4797, 6252 or Schedules K-1; and doesn't figure the loss to
@@ -181,14 +193,13 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule A, including the separate-return rule of IRC §63(c)(6)
-2. Schedule 3 credits (child care, Form 2441; education, Form 8863;
+1. Schedule 3 credits (child care, Form 2441; education, Form 8863;
    saver's, Form 8880) and Credit Limit Worksheet A
-3. Form 8962, the premium tax credit
-4. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-5. Form 8995, the qualified business income deduction
-6. An EIC qualifying child who isn't your dependent (Form 8332)
-7. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+2. Form 8962, the premium tax credit
+3. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+4. Form 8995, the qualified business income deduction
+5. An EIC qualifying child who isn't your dependent (Form 8332)
+6. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-8. Form 8615 (kiddie tax) and Form 6251 (AMT)
-9. Tax year 2026 (Rev. Proc. 2025-32)
+7. Form 8615 (kiddie tax) and Form 6251 (AMT)
+8. Tax year 2026 (Rev. Proc. 2025-32)

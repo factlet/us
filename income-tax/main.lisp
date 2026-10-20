@@ -35,6 +35,9 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
+(input spouse-itemizes : bool :default false
+  :label "Married filing separately, and your spouse itemizes deductions" :line 12b
+  :cite "IRC §63(c)(6)(A)")
 ; Read only on a separate return, for social security benefits and the
 ; IRA deduction.
 (input lived-apart-all-year : bool :default false
@@ -197,5 +200,7 @@
 (module f1040s2 (include "forms/f1040s2.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
+(module f1040sa (include "forms/f1040sa.lisp"))
+(module f1040sa-salt (include "forms/f1040sa-salt.lisp"))
 (module f8959 (include "forms/f8959.lisp"))
 (module f8960 (include "forms/f8960.lisp"))

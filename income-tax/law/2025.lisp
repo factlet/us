@@ -114,6 +114,16 @@
     (single head-of-household) $2,000
     else                       $1,600))
 
+; Itemized: medical expenses past this share of AGI, and state and local
+; taxes up to the limit, which comes down by 30% of modified AGI over the
+; threshold, but not below the floor.
+(def medical-floor :cite "IRC §213(a)" 7.5%)
+(def salt-limit :cite "IRC §164(b)(7); P.L. 119-21" $40,000)
+(def salt-phaseout-start :cite "IRC §164(b)(7)"
+  (table filing-status married-separate $250,000 else $500,000))
+(def salt-phaseout-rate :cite "IRC §164(b)(7)" 30%)
+(def salt-floor :cite "IRC §164(b)(7)" $10,000)
+
 ; Per filer 65 or older, 2025 through 2028, whether or not they itemize.
 (def senior-deduction :cite "IRC §151(d)(5)(C); P.L. 119-21 §70103" $6,000)
 (def senior-phaseout-start :cite "IRC §151(d)(5)(C)(ii)"

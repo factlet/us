@@ -32,6 +32,7 @@
 (def line10 :label "Adjustments to income from Schedule 1" :line 10 f1040s1/line26)
 (def line11a :label "Adjusted gross income" :line 11a :cite "IRC §62"
   (- line9 line10))
+(def line11b :label "Adjusted gross income" :line 11b line11a)  ; carried to page 2
 
 ; ---- Deductions ----
 
@@ -43,8 +44,16 @@
       (min law/std-deduction
            (max law/dependent-std-minimum (+ line1z law/dependent-std-addition)))
       law/std-deduction))
-(def line12e :label "Standard deduction" :line 12e :cite "IRC §63(c)"
-  (+ basic-std-deduction (* line12d law/aged-blind-addition)))
+; None at all when a spouse filing separately itemizes.
+(def standard-deduction :label "Standard deduction" :cite "IRC §63(c)"
+  (if (and (= filing-status 'married-separate) spouse-itemizes)
+      $0
+      (+ basic-std-deduction (* line12d law/aged-blind-addition))))
+; The larger, unless you choose to itemize anyway (Schedule A line 18).
+(def itemizes :label "Itemizes deductions" :cite "IRC §63(b), (e)"
+  (or f1040sa/elect-itemize (> f1040sa/line17 standard-deduction)))
+(def line12e :label "Standard deduction or itemized deductions" :line 12e
+  (if itemizes f1040sa/line17 standard-deduction))
 (def line13b :label "Additional deductions from Schedule 1-A" :line 13b f1040s1a/line38)
 (def line14 :label "Total deductions" :line 14 (+ line12e line13b))  ; + 13a
 (def line15 :label "Taxable income" :line 15 :cite "IRC §63"
