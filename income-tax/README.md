@@ -19,10 +19,10 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`); and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-gs`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1a`, `f1040s8`, `f1040-qdcg`, `f1040-eic` |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s8`, `f1040-qdcg`, `f1040-eic`, `f1040s1-sli` |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -56,8 +56,11 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 ## Modeled so far
 
 - Form 1040 lines 1a–37 for wages, taxable and tax-exempt interest,
-  dividends and capital gain distributions, withholding, and refunds or
-  amounts owed.
+  dividends and capital gain distributions, unemployment compensation,
+  withholding, and refunds or amounts owed.
+- Schedule 1: unemployment compensation (line 7) and the student loan
+  interest deduction (line 21), with its phaseout and the rules against
+  taking it on a separate return or as someone else's dependent.
 - The standard deduction, with the additions for age and blindness and the
   limit for someone claimed as a dependent.
 - Tax from the Tax Table (the midpoint of each $25 or $50 row) below
@@ -96,7 +99,7 @@ These give wrong answers for returns they affect, so they come first:
 
 In rough order of how many returns need them:
 
-1. Schedule 1: unemployment, IRA, HSA and student loan adjustments
+1. Schedule 1: IRA and HSA adjustments
 2. Social security benefits (line 6b), IRA distributions and pensions (4b, 5b)
 3. Schedule C, Schedule SE and Schedule 2 (self-employment, additional
    Medicare and net investment income taxes), and EIC Worksheet B

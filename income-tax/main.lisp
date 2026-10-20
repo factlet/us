@@ -108,10 +108,21 @@
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
   (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12))
 
+(collection f1099-gs :label "Forms 1099-G"
+  (input unemployment : usd :label "Unemployment compensation" :line 1)
+  (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4))
+
+; What the lender received is what you paid, as long as it was on a
+; qualified student loan you were legally obligated to pay.
+(collection f1098-es :label "Forms 1098-E"
+  (input interest : usd :label "Student loan interest received by lender" :line 1))
+
 (module law (include "law/2025.lisp"))
 
 (module f1040 (include "forms/f1040.lisp"))
 (module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
 (module f1040-eic (include "forms/f1040-eic.lisp"))
+(module f1040s1 (include "forms/f1040s1.lisp"))
+(module f1040s1-sli (include "forms/f1040s1-sli.lisp"))
 (module f1040s1a (include "forms/f1040s1a.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))

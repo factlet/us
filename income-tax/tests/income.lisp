@@ -6,7 +6,7 @@
   (member f1099-ints bank (given interest $1,200 treasury-interest $800 withheld $100))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $500))
   (member f1099-divs fund (given ordinary $1,000 exempt-interest $250))
-  (empty dependents)
+  (empty f1099-gs f1098-es dependents)
   (expect f1040/line2a $750
           f1040/line2b $2,000
           f1040/line3b $1,000
@@ -24,4 +24,23 @@
   (empty f1099-ints)
   (expect f1040/line9 ?)
   (empty f1099-divs)
+  (expect f1040/line9 ?)
+  (empty f1099-gs)
   (expect f1040/line9 $40,000))
+
+(test "unemployment adds to income, but isn't earned income"
+  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (member w2s acme (given wages $8,000 withheld $0))
+  (member f1099-gs state (given unemployment $4,000 withheld $400))
+  (empty f1099-ints f1099-divs f1098-es dependents)
+  (expect f1040s1/line7 $4,000
+          f1040/line8 $4,000
+          f1040/line11a $12,000
+          f1040/line16 $0
+          f1040/line25b $400
+          ; the EIC on earned income, 7.65% × $8,025, is $614, but past the
+          ; phaseout start it can't exceed the EIC on AGI:
+          ; $649 − 7.65% × ($12,025 − $10,620)
+          f1040-eic/line2 $614
+          f1040/line27a $542
+          f1040/line34 $942))

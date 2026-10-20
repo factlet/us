@@ -35,6 +35,16 @@
     married-separate                            $300,000
     head-of-household                           $566,700))
 
+; ---- Adjustments to income ----
+
+; Student loan interest up to the maximum, reduced in proportion as
+; modified AGI passes through the range above the start.
+(def sli-max :cite "IRC §221(b)(1)" $2,500)
+(def sli-phaseout-start :cite "IRC §221(b)(2)(B), (f); Rev. Proc. 2024-40"
+  (table filing-status married-joint $170,000 else $85,000))
+(def sli-phaseout-range :cite "IRC §221(b)(2)(B)"
+  (table filing-status married-joint $30,000 else $15,000))
+
 ; ---- Deductions ----
 
 (def std-deduction :cite "IRC §63(c)(2); P.L. 119-21 §70102"
