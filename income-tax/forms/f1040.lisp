@@ -16,8 +16,19 @@
 
 ; ---- Deductions ----
 
-(def line12e :label "Standard deduction" :line 12e :cite "IRC §63(c)" law/std-deduction)
-(def line15 :label "Taxable income" :line 15 :cite "IRC §63" (excess line11a line12e))
+(def line12d :label "Boxes checked for age 65 or blindness" :line 12d
+  (+ you/boxes (if joint spouse/boxes 0)))
+; Standard Deduction Worksheet for Dependents, when someone can claim you.
+(def basic-std-deduction :cite "IRC §63(c)(2), (5)"
+  (if claimed-as-dependent
+      (min law/std-deduction
+           (max law/dependent-std-minimum (+ line1a law/dependent-std-addition)))
+      law/std-deduction))
+(def line12e :label "Standard deduction" :line 12e :cite "IRC §63(c)"
+  (+ basic-std-deduction (* line12d law/aged-blind-addition)))
+(def line13b :label "Additional deductions from Schedule 1-A" :line 13b f1040s1a/line38)
+(def line14 :label "Total deductions" :line 14 (+ line12e line13b))
+(def line15 :label "Taxable income" :line 15 :cite "IRC §63" (excess line11a line14))
 
 ; ---- Tax ----
 

@@ -1,5 +1,5 @@
 (test "interest and dividends add to wages, but tax-exempt interest doesn't"
-  (given filing-status 'single)
+  (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $40,000 withheld $3,000))
   (member f1099-ints bank (given interest $1,200 treasury-interest $800 withheld $100))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $500))

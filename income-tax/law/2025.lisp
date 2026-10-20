@@ -1,5 +1,10 @@
 ; Tax year 2025: the inflation adjustments of Rev. Proc. 2024-40, as
-; amended by P.L. 119-21 (2025-07-04) for the standard deduction.
+; amended by P.L. 119-21 (2025-07-04) for the standard deduction and the
+; new senior deduction.
+
+; Ages "at the end of the year" for rules where a birthday counts a day
+; early, such as turning 65.
+(def day-after-year-end 2026-01-01)
 
 ; Each rate applies up to the edge after it.
 (def brackets :cite "IRC §1(j)(2); Rev. Proc. 2024-40 §3.01"
@@ -32,3 +37,18 @@
     (single married-separate)                   $15,750
     (married-joint qualifying-surviving-spouse) $31,500
     head-of-household                           $23,625))
+; For someone another taxpayer can claim: the greater of the minimum or
+; earned income plus the addition, but no more than the usual amount.
+(def dependent-std-minimum :cite "IRC §63(c)(5)(A); Rev. Proc. 2024-40" $1,350)
+(def dependent-std-addition :cite "IRC §63(c)(5)(B); Rev. Proc. 2024-40" $450)
+; Per filer who is 65 or older, and again per filer who is blind.
+(def aged-blind-addition :cite "IRC §63(f); Rev. Proc. 2024-40"
+  (table filing-status
+    (single head-of-household) $2,000
+    else                       $1,600))
+
+; Per filer 65 or older, 2025 through 2028, whether or not they itemize.
+(def senior-deduction :cite "IRC §151(d)(5)(C); P.L. 119-21 §70103" $6,000)
+(def senior-phaseout-start :cite "IRC §151(d)(5)(C)(ii)"
+  (table filing-status married-joint $150,000 else $75,000))
+(def senior-phaseout-rate :cite "IRC §151(d)(5)(C)(ii)" 6%)

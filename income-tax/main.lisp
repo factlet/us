@@ -12,10 +12,25 @@
   single married-joint married-separate head-of-household
   qualifying-surviving-spouse)
 
+; The identification number someone had by the return's due date:
+;   ssn          a social security number valid for employment
+;   nonwork-ssn  one whose card says "not valid for employment"
+;   itin         an individual taxpayer identification number
+;   atin         an adoption taxpayer identification number (dependents)
+;   no-tin       none, or one issued after the due date
+(enum tin ssn nonwork-ssn itin atin no-tin)
+
 ; The form's "subtract b from a; if zero or less, enter -0-".
 (defn excess [a : usd b : usd] (max $0 (- a b)))
 
 (input filing-status : filing-status :label "Filing status")
+(def joint (= filing-status 'married-joint))
+
+(module you (include "person.lisp"))
+(module spouse (include "person.lisp"))   ; read only on a joint return
+
+(input claimed-as-dependent : bool :default false
+  :label "Someone can claim you as a dependent" :line 12a)
 
 (collection w2s :label "Forms W-2"
   (input wages : usd :label "Wages, tips, other compensation" :line 1)
@@ -39,3 +54,4 @@
 
 (module f1040 (include "forms/f1040.lisp"))
 (module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
+(module f1040s1a (include "forms/f1040s1a.lisp"))
