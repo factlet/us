@@ -158,6 +158,27 @@
 (def se-ss-rate :cite "IRC §1401(a)" 12.4%)
 (def se-medicare-rate :cite "IRC §1401(b)(1)" 2.9%)
 
+; Additional Medicare Tax: 0.9% more on Medicare wages and self-employment
+; income over the threshold, on top of the regular 1.45% employees pay. An
+; employer withholds it on what it pays over $200,000. None of these are
+; adjusted for inflation.
+(def medicare-rate :cite "IRC §3101(b)(1)" 1.45%)
+(def medicare-surtax-rate :cite "IRC §§1401(b)(2)(A), 3101(b)(2)" 0.9%)
+(def medicare-surtax-threshold :cite "IRC §3101(b)(2)"
+  (table filing-status
+    married-joint    $250,000
+    married-separate $125,000
+    else             $200,000))
+(def medicare-surtax-withholding-start :cite "IRC §3102(f)(1)" $200,000)
+
+; Net investment income tax, also not adjusted for inflation.
+(def niit-rate :cite "IRC §1411(a)(1)" 3.8%)
+(def niit-threshold :cite "IRC §1411(b)"
+  (table filing-status
+    (married-joint qualifying-surviving-spouse) $250,000
+    married-separate                            $125,000
+    else                                        $200,000))
+
 ; On the taxable part of a distribution from an IRA or retirement plan
 ; before age 59½, unless an exception applies.
 (def early-distribution-rate :cite "IRC §72(t)(1)" 10%)

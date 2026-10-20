@@ -3,7 +3,7 @@
 
 (test "the EIC Table's example: single, one child, $2,455"
   (given filing-status 'single you/birth-date 1995-01-01 you/tin 'ssn)
-  (member w2s cafe (given wages $2,455 withheld $0))
+  (member w2s cafe (given wages $2,455 medicare-wages $2,455 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2020-01-01 qualifying-child true tin 'ssn))
   (expect f1040-eic/children 1
@@ -13,15 +13,15 @@
 
 (test "without a child, the credit rises at 7.65% to $649"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line27a $614)                        ; 7.65% × $8,025
-  (member w2s side-gig (given wages $1,000 withheld $0))
+  (member w2s side-gig (given wages $1,000 medicare-wages $1,000 withheld $0))
   (expect f1040/line27a $649))                       ; 7.65% × $9,025 is past the maximum
 
 (test "AGI past the phaseout start takes the smaller of the two credits"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $9,000 withheld $0))
+  (member w2s acme (given wages $9,000 medicare-wages $9,000 withheld $0))
   (member f1099-ints bank (given interest $3,000))
   (empty f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040-eic/line2 $649
@@ -31,19 +31,19 @@
 
 (test "the table's last row stops where the credit runs out"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $50,410 withheld $0))
+  (member w2s acme (given wages $50,410 medicare-wages $50,410 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2020-01-01 qualifying-child true tin 'ssn))
   ; Row $50,400–$50,434, middle $50,417: $4,328 − 15.98% × $27,067
   (expect f1040/line27a $3)
-  (member w2s side-gig (given wages $24 withheld $0))
+  (member w2s side-gig (given wages $24 medicare-wages $24 withheld $0))
   (expect f1040/line27a $0))
 
 (test "on a joint return, the credit without a child lasts to $26,214"
   (given filing-status 'married-joint
          you/birth-date 1990-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'ssn)
-  (member w2s acme (given wages $26,200 withheld $0))
+  (member w2s acme (given wages $26,200 medicare-wages $26,200 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   ; Row $26,200–$26,214, middle $26,207: $649 − 7.65% × $8,477
   (expect f1040/line27a $1))
@@ -52,7 +52,7 @@
   (given filing-status 'married-joint
          you/birth-date 1985-01-01 you/tin 'ssn
          spouse/birth-date 1985-01-01 spouse/tin 'ssn)
-  (member w2s acme (given wages $56,740 withheld $0))
+  (member w2s acme (given wages $56,740 medicare-wages $56,740 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   ; Row middle $56,725 is $26,255 past the $30,470 phaseout start.
   (member dependents a (given birth-date 2015-01-01 qualifying-child true tin 'ssn))
@@ -66,7 +66,7 @@
 
 (test "investment income over $11,950 ends the credit, tax-exempt interest included"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $5,000 withheld $0))
+  (member w2s acme (given wages $5,000 medicare-wages $5,000 withheld $0))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $11,950))
   (empty f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line2a $11,950
@@ -79,7 +79,7 @@
 
 (test "without a child, 25 by the end of the year and not yet 65"
   (given filing-status 'single you/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   ; Turning 25 counts a day early...
   (given you/birth-date 2001-01-01)
@@ -96,7 +96,7 @@
   (given filing-status 'married-joint
          you/birth-date 1950-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line27a $614)
   ; Questions only single filers are asked.
@@ -105,7 +105,7 @@
 
 (test "a qualifying child without an SSN isn't counted, but waives the age rule"
   (given filing-status 'single you/birth-date 2004-01-01 you/tin 'ssn)   ; 21
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents mom (given birth-date 1970-01-01 qualifying-child false tin 'ssn))
   (expect f1040/line27a $0)
@@ -116,7 +116,7 @@
 
 (test "a child who lived abroad doesn't count"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents a
     (given birth-date 2015-01-01 qualifying-child true tin 'ssn lived-abroad true)
@@ -127,7 +127,7 @@
 
 (test "married filing separately takes it with a child, once separated"
   (given filing-status 'married-separate you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
   (expect f1040/line27a $0)
@@ -137,13 +137,13 @@
 (test "married filing separately without a child never takes it"
   (given filing-status 'married-separate you/birth-date 1990-05-01 you/tin 'ssn
          separated-spouse true)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line27a $0))
 
 (test "someone else's qualifying child can't take it"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
   (expect f1040/line27a $4,328)
@@ -152,7 +152,7 @@
 
 (test "without a child, neither a dependent nor someone living abroad can take it"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line27a $614)
   (given home-abroad true)
@@ -164,7 +164,7 @@
   (given filing-status 'married-joint
          you/birth-date 1990-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'itin)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
   (expect f1040s8/line4 1
@@ -177,7 +177,7 @@
 
 (test "a nonresident alien for part of the year takes it only on a joint return"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line27a $614)
   (given you/nonresident-alien true)
@@ -188,7 +188,7 @@
 
 (test "filing Form 2555 rules it out"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
   (expect f1040/line27a $4,328)
@@ -197,7 +197,7 @@
 
 (test "no credit while barred after a fraudulent or reckless claim"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $20,000 withheld $0))
+  (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
   (expect f1040/line27a $4,328)

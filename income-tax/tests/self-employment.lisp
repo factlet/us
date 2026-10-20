@@ -17,7 +17,8 @@
 
 (test "the 12.4% stops where wages and self-employment reach $176,100"
   (given filing-status 'single you/birth-date 1990-05-01)
-  (member w2s acme (given wages $150,000 withheld $0 ss-wages $150,000))
+  (member w2s acme
+    (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
   (member f1040scs consulting (given receipts $40,000))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
   (expect you/f1040sse/line9 $26,100
@@ -27,7 +28,8 @@
 
 (test "under $400 of net earnings, no self-employment tax, nor questions for it"
   (given filing-status 'single you/birth-date 1990-05-01)
-  (member w2s acme (given wages $30,000 withheld $0))  ; no social security wages asked
+  ; No social security wages asked.
+  (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1040scs side (given receipts $400))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
   (expect you/f1040sse/line4c $369.40
@@ -47,7 +49,8 @@
 (test "each spouse figures their own, against their own wages"
   (given filing-status 'married-joint
          you/birth-date 1985-01-01 spouse/birth-date 1987-01-01)
-  (member w2s acme (given wages $150,000 withheld $0 ss-wages $150,000))
+  (member w2s acme
+    (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
   (member f1040scs yours (given receipts $40,000))
   (member f1040scs theirs (given receipts $80,000 spouses true))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)

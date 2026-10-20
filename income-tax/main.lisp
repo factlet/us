@@ -106,6 +106,7 @@
   (input ss-wages : usd :label "Social security wages" :line 3)
   (input ss-tips : usd :default $0 :label "Social security tips" :line 7)
   (input ss-withheld : usd :label "Social security tax withheld" :line 4)
+  (input medicare-wages : usd :label "Medicare wages and tips" :line 5)
   (input medicare-withheld : usd :label "Medicare tax withheld" :line 6))
 
 (collection f1099-ints :label "Forms 1099-INT"
@@ -175,3 +176,5 @@
 (module f1040s1a (include "forms/f1040s1a.lisp"))
 (module f1040s2 (include "forms/f1040s2.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))
+(module f8959 (include "forms/f8959.lisp"))
+(module f8960 (include "forms/f8960.lisp"))

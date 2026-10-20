@@ -34,7 +34,7 @@
 
 (test "a loss offsets other income"
   (given filing-status 'single you/birth-date 1990-05-01)
-  (member w2s acme (given wages $50,000 withheld $0))
+  (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (member f1040scs startup (given receipts $5,000 other-expenses $8,000))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s dependents)
   (expect f1040s1/line3 -$3,000

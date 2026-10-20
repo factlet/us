@@ -2,7 +2,7 @@
 
 (test "interest and dividends add to wages, but tax-exempt interest doesn't"
   (given filing-status 'single you/birth-date 1990-05-01)
-  (member w2s acme (given wages $40,000 withheld $3,000))
+  (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $3,000))
   (member f1099-ints bank (given interest $1,200 treasury-interest $800 withheld $100))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $500))
   (member f1099-divs fund (given ordinary $1,000 exempt-interest $250))
@@ -19,7 +19,7 @@
 
 (test "income waits on every kind of document"
   (given filing-status 'single)
-  (member w2s acme (given wages $40,000 withheld $3,000))
+  (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $3,000))
   (expect f1040/line9 ?)
   (empty f1099-ints)
   (expect f1040/line9 ?)
@@ -36,7 +36,7 @@
 
 (test "unemployment adds to income, but isn't earned income"
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
-  (member w2s acme (given wages $8,000 withheld $0))
+  (member w2s acme (given wages $8,000 medicare-wages $8,000 withheld $0))
   (member f1099-gs state (given unemployment $4,000 withheld $400))
   (empty f1099-ints f1099-divs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1/line7 $4,000

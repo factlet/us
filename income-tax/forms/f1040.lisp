@@ -80,7 +80,8 @@
 (def line25b :label "Withholding from Forms 1099" :line 25b
   (+ (sum f1099-ints withheld) (sum f1099-divs withheld) (sum f1099-gs withheld)
      (sum f1099-rs withheld) (sum ssa1099s withheld)))
-(def line25d :label "Total withholding" :line 25d (+ line25a line25b))  ; + 25c
+(def line25c :label "Withholding from other forms" :line 25c f8959/line24)
+(def line25d :label "Total withholding" :line 25d (+ line25a line25b line25c))
 ; A credit of zero settles it without asking who can take it, as Worksheet
 ; A stops when line 2 is zero.
 (def line27a :label "Earned income credit" :line 27a :cite "IRC §32"

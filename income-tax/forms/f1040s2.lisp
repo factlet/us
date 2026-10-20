@@ -1,6 +1,7 @@
-; Schedule 2 (2025), Additional Taxes. So far only self-employment tax, and
-; the additional taxes on early distributions from IRAs and retirement
-; plans and on HSA distributions not spent on medical care.
+; Schedule 2 (2025), Additional Taxes. So far only self-employment tax, the
+; Additional Medicare Tax, the net investment income tax, and the
+; additional taxes on early distributions from IRAs and retirement plans
+; and on HSA distributions not spent on medical care.
 
 ; ---- Part II: Other taxes ----
 
@@ -11,7 +12,10 @@
 ; taxable part, without Form 5329.
 (def line8 :label "Additional tax on IRAs and other retirement plans" :cite "IRC §72(t)"
   (* law/early-distribution-rate (sum f1099-rs (if early taxable-part $0))))
+(def line11 :label "Additional Medicare Tax" f8959/line18)
+(def line12 :label "Net investment income tax" f8960/line17)
 (def line17c :label "Additional tax on HSA distributions"
   (+ you/f8889/line17b (if joint spouse/f8889/line17b $0)))
 (def line18 :label "Total additional taxes" line17c)             ; + 17a 17b 17d–17z
-(def line21 :label "Total other taxes" (+ line4 line8 line18))   ; + 7 9–16 19
+(def line21 :label "Total other taxes"
+  (+ line4 line8 line11 line12 line18))                          ; + 7 9 10 13–16 19

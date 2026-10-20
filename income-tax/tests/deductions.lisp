@@ -4,7 +4,7 @@
   (given filing-status 'married-joint
          you/birth-date 1955-03-01 you/blind true you/tin 'ssn
          spouse/birth-date 1958-07-04 spouse/tin 'ssn)
-  (member w2s acme (given wages $160,000 withheld $20,000))
+  (member w2s acme (given wages $160,000 medicare-wages $160,000 withheld $20,000))
   (member f1099-ints bank (given interest $10,000))
   (empty f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line11a $170,000
@@ -20,7 +20,7 @@
 
 (test "turning 65: born on 1961-01-01 counts for 2025, a day later doesn't"
   (given filing-status 'single you/tin 'ssn)
-  (member w2s acme (given wages $50,000 withheld $0))
+  (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (given you/birth-date 1961-01-01)
   (expect you/aged true
@@ -33,7 +33,7 @@
 
 (test "the senior deduction asks for an SSN only of seniors"
   (given filing-status 'single you/birth-date 1950-01-01)
-  (member w2s acme (given wages $30,000 withheld $0))
+  (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1a/line37 ? f1040/line37 ?)
   (given you/tin 'itin)
@@ -41,14 +41,14 @@
 
 (test "married filing separately gets no senior deduction"
   (given filing-status 'married-separate you/birth-date 1950-01-01 you/tin 'ssn)
-  (member w2s acme (given wages $30,000 withheld $0))
+  (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line12e $17,350                      ; $15,750 + $1,600
           f1040s1a/line37 $0))
 
 (test "a dependent's standard deduction is earned income plus $450"
   (given filing-status 'single you/birth-date 2000-09-01 claimed-as-dependent true)
-  (member w2s cafe (given wages $14,000 withheld $100))
+  (member w2s cafe (given wages $14,000 medicare-wages $14,000 withheld $100))
   (member f1099-ints bank (given interest $5,000))
   (empty f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line12e $14,450

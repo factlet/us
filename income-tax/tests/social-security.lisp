@@ -19,7 +19,7 @@
 (test "85% of what's over $34,000, but no more than 85% of the benefits"
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $30,000 withheld $3,000))
-  (member w2s acme (given wages $50,000 withheld $2,000))
+  (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $2,000))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es f1040scs dependents)
   (expect f1040-ssb/line9 $40,000                    ; $15,000 + $50,000 − $25,000
           f1040-ssb/line14 $4,500                    ; half of $9,000
@@ -72,7 +72,7 @@
 (test "repayments over the year's benefits leave none taxable"
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits -$500))
-  (member w2s acme (given wages $40,000 withheld $0))
+  (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es f1040scs dependents)
   (expect f1040/line6a -$500
           f1040/line6b $0
@@ -84,7 +84,7 @@
   ; benefits taxable after it.
   (given filing-status 'single you/birth-date 1962-03-01 you/tin 'ssn
          you/retirement-plan true you/ira-contributions $8,000)
-  (member w2s acme (given wages $48,000 withheld $0))
+  (member w2s acme (given wages $48,000 medicare-wages $48,000 withheld $0))
   (member ssa1099s you (given net-benefits $46,000))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es f1040scs dependents)
   ; $4,500 + 85% × ($23,000 + $48,000 − $34,000)

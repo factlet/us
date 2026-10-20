@@ -8,7 +8,7 @@
 (test "self-only coverage: up to $4,300, less what the employer put in"
   (given filing-status 'single you/birth-date 1990-05-01
          you/hdhp 'self-only you/hsa-contributions $3,000 you/hsa-employer $2,000)
-  (member w2s acme (given wages $50,000 withheld $0))
+  (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect you/f8889/line3 $4,300
           you/f8889/line12 $2,300
@@ -57,7 +57,7 @@
 (test "distributions not spent on medical care are taxable, and 20% more"
   (given filing-status 'single you/birth-date 1990-05-01
          you/hsa-distributions $3,000 you/hsa-medical $2,000)
-  (member w2s acme (given wages $40,000 withheld $4,000))
+  (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $4,000))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect you/f8889/line16 $1,000
           f1040s1/line8f $1,000
@@ -76,7 +76,7 @@
   (given filing-status 'single you/birth-date 1990-05-01
          you/retirement-plan true you/ira-contributions $7,000
          you/hdhp 'self-only you/hsa-contributions $4,300)
-  (member w2s acme (given wages $85,000 withheld $0))
+  (member w2s acme (given wages $85,000 medicare-wages $85,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
   (expect f1040s1-ira/line5 $80,700
           f1040s1/line20 $5,810                      ; 70% × ($89,000 − $80,700)

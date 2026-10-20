@@ -27,7 +27,7 @@
 
 (test "an early distribution owes 10% more, unless it was rolled over"
   (given filing-status 'single you/birth-date 1990-05-01)
-  (member w2s acme (given wages $50,000 withheld $5,000))
+  (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $5,000))
   (member f1099-rs plan (given gross $10,000 taxable $10,000 withheld $2,000 early true))
   (empty f1099-ints f1099-divs f1099-gs f1098-es ssa1099s f1040scs dependents)
   (expect f1040/line5b $10,000
