@@ -1,11 +1,13 @@
 ; Tax year 2025: the inflation adjustments of Rev. Proc. 2024-40, as
-; amended by P.L. 119-21 (2025-07-04) for the standard deduction and the
-; new senior deduction and the child tax credit.
+; amended by P.L. 119-21 (2025-07-04) for the standard deduction, the child
+; tax credit and the new senior deduction.
 
 (def year-end 2025-12-31)
 ; Ages "at the end of the year" for rules where a birthday counts a day
 ; early, such as turning 65.
 (def day-after-year-end 2026-01-01)
+
+; ---- Tax rates ----
 
 ; Each rate applies up to the edge after it.
 (def brackets :cite "IRC §1(j)(2); Rev. Proc. 2024-40 §3.01"
@@ -33,6 +35,8 @@
     married-separate                            $300,000
     head-of-household                           $566,700))
 
+; ---- Deductions ----
+
 (def std-deduction :cite "IRC §63(c)(2); P.L. 119-21 §70102"
   (table filing-status
     (single married-separate)                   $15,750
@@ -54,6 +58,8 @@
   (table filing-status married-joint $150,000 else $75,000))
 (def senior-phaseout-rate :cite "IRC §151(d)(5)(C)(ii)" 6%)
 
+; ---- Credits ----
+
 (def ctc-per-child :cite "IRC §24(h)(2); P.L. 119-21 §70104" $2,200)
 (def odc-per-dependent :cite "IRC §24(h)(4)" $500)
 ; $50 per $1,000 of modified AGI over the threshold, or fraction thereof.
@@ -65,3 +71,21 @@
 (def actc-per-child :cite "IRC §24(h)(5); Rev. Proc. 2024-40" $1,700)
 (def actc-earned-floor :cite "IRC §24(h)(6)" $2,500)
 (def actc-rate :cite "IRC §24(d)(1)(B)(i)" 15%)
+
+; The earned income credit, by number of qualifying children: none, one,
+; two, three or more. It rises at the first rate to the maximum, then falls
+; at the phaseout rate from the start, on adjusted gross income or earned
+; income, whichever is greater, until it's gone at the end.
+(def eic-rate :cite "IRC §32(b)(1)" [7.65% 34% 40% 45%])
+(def eic-max :cite "IRC §32(b); Rev. Proc. 2024-40 §3.06" [$649 $4,328 $7,152 $8,046])
+(def eic-phaseout-rate :cite "IRC §32(b)(1)" [7.65% 15.98% 21.06% 21.06%])
+(def eic-phaseout-start :cite "IRC §32(b)(2); Rev. Proc. 2024-40 §3.06"
+  (table filing-status
+    married-joint [$17,730 $30,470 $30,470 $30,470]
+    else          [$10,620 $23,350 $23,350 $23,350]))
+(def eic-phaseout-end :cite "Rev. Proc. 2024-40 §3.06"
+  (table filing-status
+    married-joint [$26,214 $57,554 $64,430 $68,675]
+    else          [$19,104 $50,434 $57,310 $61,555]))
+; No credit at all once investment income exceeds this.
+(def eic-investment-limit :cite "IRC §32(i); Rev. Proc. 2024-40 §3.06(2)" $11,950)

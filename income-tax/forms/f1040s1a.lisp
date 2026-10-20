@@ -2,7 +2,7 @@
 ; enhanced deduction for seniors; tips, overtime and car loan interest
 ; (Parts II–IV) are to come.
 
-(def line3 :label "Modified adjusted gross income" f1040/line11a)
+(def line3 :label "Modified adjusted gross income" f1040/line11a)  ; + 2e
 
 ; ---- Part V: Enhanced deduction for seniors ----
 
@@ -17,4 +17,4 @@
   (if (and joint spouse/aged spouse/valid-ssn) line35 $0))
 (def line37 :label "Enhanced deduction for seniors" (+ line36a line36b))
 
-(def line38 :label "Total additional deductions" line37)
+(def line38 :label "Total additional deductions" line37)        ; + 13 21 30

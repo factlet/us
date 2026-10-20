@@ -1,3 +1,6 @@
+; Tax: the Tax Table, the Tax Computation Worksheet and the Qualified
+; Dividends and Capital Gain Tax Worksheet.
+
 (test "the Tax Table taxes the middle of the row"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $58,000))

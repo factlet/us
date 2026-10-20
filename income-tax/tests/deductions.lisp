@@ -1,3 +1,5 @@
+; Deductions: the standard deduction and Schedule 1-A.
+
 (test "joint seniors, one blind, in the senior deduction's phaseout"
   (given filing-status 'married-joint
          you/birth-date 1955-03-01 you/blind true you/tin 'ssn

@@ -1,3 +1,5 @@
+; Payments: withholding, and the refund or amount owed.
+
 (test "withholding over the tax is refunded, and short of it is owed"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $58,000 withheld $6,000))

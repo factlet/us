@@ -1,3 +1,5 @@
+; Credits: Schedule 8812.
+
 (test "joint filers with two young children"
   (given filing-status 'married-joint
          you/birth-date 1985-01-01 you/tin 'ssn
@@ -110,7 +112,9 @@
           f1040s8/line20 $3,375                      ; 15% × ($25,000 − $2,500)
           f1040/line28 $1,700
           f1040/line24 $0
-          f1040/line34 $2,200))                      ; $500 + $1,700
+          ; $4,328 − 15.98% × ($25,025 − $23,350)
+          f1040/line27a $4,060
+          f1040/line34 $6,260))                      ; $500 + $4,060 + $1,700
 
 (test "the additional child tax credit is 15% of earned income over $2,500"
   (given filing-status 'single you/birth-date 1995-01-01 you/tin 'ssn)
@@ -121,4 +125,28 @@
           f1040s8/line17 $1,700
           f1040s8/line20 $1,125                      ; 15% × ($10,000 − $2,500)
           f1040/line28 $1,125
-          f1040/line34 $1,125))
+          f1040/line27a $3,409                       ; 34% × $10,025
+          f1040/line34 $4,534))                      ; $1,125 + $3,409
+
+(test "with three children, Part II-B refunds payroll taxes the EIC doesn't"
+  (given filing-status 'married-joint
+         you/birth-date 1990-01-01 you/tin 'ssn
+         spouse/birth-date 1990-01-01 spouse/tin 'itin)
+  (member w2s acme (given wages $4,000 withheld $0 ss-withheld $248 medicare-withheld $58))
+  (empty f1099-ints f1099-divs)
+  (member dependents a (given birth-date 2015-03-01 qualifying-child true tin 'ssn))
+  (member dependents b (given birth-date 2017-07-01 qualifying-child true tin 'ssn))
+  (member dependents c (given birth-date 2020-01-01 qualifying-child true tin 'ssn))
+  ; No EIC without the spouse's SSN, so all the payroll taxes count.
+  (expect f1040s8/line4 3
+          f1040s8/line17 $5,100                      ; 3 × $1,700
+          f1040s8/line20 $225                        ; 15% × ($4,000 − $2,500)
+          f1040s8/line21 $306
+          f1040/line27a $0
+          f1040s8/line25 $306
+          f1040s8/line27 $306)
+  (given spouse/tin 'ssn)
+  (expect f1040/line27a $1,811                       ; 45% × $4,025
+          f1040s8/line25 $0
+          f1040s8/line27 $225
+          f1040/line34 $2,036))                      ; $1,811 + $225

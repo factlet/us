@@ -1,3 +1,5 @@
+; Income: wages, interest and dividends.
+
 (test "interest and dividends add to wages, but tax-exempt interest doesn't"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $40,000 withheld $3,000))

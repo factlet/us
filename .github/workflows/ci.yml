@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    # The Makefile runs factlet from its checkout next to this one.
+    - uses: actions/checkout@v4
+      with:
+        path: us
+    - uses: actions/checkout@v4
+      with:
+        repository: matthunz/factlet
+        path: factlet
+    - uses: Swatinem/rust-cache@v2
+      with:
+        workspaces: factlet
+    - name: Check
+      working-directory: us
+      run: make check
+    - name: Test
+      working-directory: us
+      run: make test
