@@ -71,6 +71,14 @@
 ; A limit phased out partly is rounded up to $10, and is at least this.
 (def ira-min-deduction :cite "IRC §219(g)(2)(B), (C)" $200)
 
+; HSA contributions up to the limit for the coverage, and $1,000 more from
+; age 55. A distribution not spent on medical care is taxable, and 20%
+; more, unless it's after age 65 or disability.
+(def hsa-self-only-limit :cite "IRC §223(b)(2)(A); Rev. Proc. 2024-25" $4,300)
+(def hsa-family-limit :cite "IRC §223(b)(2)(B); Rev. Proc. 2024-25" $8,550)
+(def hsa-catch-up :cite "IRC §223(b)(3)(B)" $1,000)
+(def hsa-distribution-rate :cite "IRC §223(f)(4)(A)" 20%)
+
 ; Student loan interest up to the maximum, reduced in proportion as
 ; modified AGI passes through the range above the start.
 (def sli-max :cite "IRC §221(b)(1)" $2,500)

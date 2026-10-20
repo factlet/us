@@ -26,3 +26,26 @@
 (input ira-contributions : usd :default $0
   :label "Traditional IRA contributions for the year, made by the return's due date"
   :cite "IRC §219(f)(3)")
+
+; For an HSA, on this person's own Form 8889.
+(input hdhp : hdhp :default 'no-hdhp
+  :label "Coverage under a high-deductible health plan, while eligible for an HSA"
+  :line 1 :cite "IRC §223(c)(1)")
+(input hsa-months : number :default 12
+  :label "Months eligible for an HSA on the first of the month: all 12 if eligible on December 1"
+  :cite "IRC §223(b)(2), (b)(8)")
+(input hsa-contributions : usd :default $0
+  :label "Your contributions to your HSA for the year, not through an employer" :line 2)
+(input hsa-employer : usd :default $0
+  :label "Employer contributions to your HSA (Form W-2, box 12, code W)" :line 9)
+(input hsa-distributions : usd :default $0
+  :label "Distributions from your HSAs (Form 1099-SA, box 1)" :line 14a)
+(input hsa-rolled-over : usd :default $0
+  :label "Of those, rolled over to another HSA, or excess contributions withdrawn in time"
+  :line 14b)
+(input hsa-medical : usd :default $0
+  :label "Of those, spent on qualified medical expenses" :line 15)
+(input hsa-exception : bool :default false
+  :label "Your taxable HSA distributions were all made after you turned 65 or became disabled"
+  :line 17a :cite "IRC §223(f)(4)(B), (C)")
+(module f8889 (include "forms/f8889.lisp"))

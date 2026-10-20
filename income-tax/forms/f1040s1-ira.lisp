@@ -38,7 +38,8 @@
 (def line3 :label "Total income"
   (+ f1040/line1z f1040/line2b f1040/line3b f1040/line4b f1040/line5b
      (if (> f1040/line6a $0) p590a-ssb/line18 $0) f1040/line7a f1040/line8))
-(def line5 :label "Modified adjusted gross income" line3)        ; − 4
+(def line4 :label "Other adjustments" f1040s1/line13)            ; + 11 12 14–19a 23 25
+(def line5 :label "Modified adjusted gross income" (- line3 line4))
 (def line2a (phaseout-end line1a))
 (def line2b (phaseout-end line1b))
 (def line6a (excess line2a line5))

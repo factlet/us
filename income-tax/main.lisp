@@ -20,6 +20,9 @@
 ;   no-tin       none, or one issued after the due date
 (enum tin ssn nonwork-ssn itin atin no-tin)
 
+; Coverage under a high-deductible health plan, for an HSA.
+(enum hdhp no-hdhp self-only family)
+
 ; The form's "subtract b from a; if zero or less, enter -0-".
 (defn excess [a : usd b : usd] (max $0 (- a b)))
 
@@ -151,10 +154,10 @@
 ; for figuring the deduction of someone covered by a retirement plan at
 ; work (Pub. 590-A, Appendix B, Worksheets 3 and 1).
 (module f1040-ssb
-  (def adjustments f1040s1/line20)                                ; + 11–19 23 25
+  (def adjustments (+ f1040s1/line13 f1040s1/line20))             ; + 11 12 14–19 23 25
   (include "forms/f1040-ssb.lisp"))
 (module p590a-ssb
-  (def adjustments $0)                                            ; + 11–19 23 25
+  (def adjustments f1040s1/line13)                                ; + 11 12 14–19 23 25
   (include "forms/f1040-ssb.lisp"))
 (module f1040-eic (include "forms/f1040-eic.lisp"))
 (module f1040s1 (include "forms/f1040s1.lisp"))

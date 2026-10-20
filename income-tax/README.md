@@ -20,9 +20,9 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
-| `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`  |
+| `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 (`you/f8889`, `spouse/f8889`)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040s1-ira`, `f1040s1-sli`; and `p590a-ssb`, `f1040-ssb` again for Pub. 590-A |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f8889`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040s1-ira`, `f1040s1-sli`; and `p590a-ssb`, `f1040-ssb` again for Pub. 590-A |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -68,7 +68,14 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   85% over the adjusted base amount, counting tax-exempt interest toward
   them. The base amounts are zero for married filing separately, unless
   the spouses lived apart all year.
-- Schedule 1: unemployment compensation (line 7); the IRA deduction
+- Form 8889 for each spouse: the HSA limit for self-only or family
+  coverage for each month eligible (all 12 under the last-month rule),
+  $1,000 more from age 55, a family limit shared between spouses, less
+  employer contributions; and distributions not spent on medical care,
+  taxable (Schedule 1 line 8f) with the 20% additional tax (Schedule 2
+  line 17c) unless after 65 or disability.
+- Schedule 1: unemployment compensation (line 7); the HSA deduction
+  (line 13); the IRA deduction
   (line 20), with the catch-up from age 50 and the phaseouts for someone
   covered by a retirement plan at work or through a spouse; and the
   student loan interest deduction (line 21), with its phaseout and the
@@ -120,6 +127,13 @@ These give wrong answers for returns they affect, so they come first:
   its first two years (code S) isn't charged.
 - A disability pension received before the minimum retirement age belongs
   on line 1h as earned income for the EIC, but is taken as a pension.
+- HSA coverage that changed between self-only and family during the year
+  is taken as the one on line 1 for every month eligible. Spouses with
+  family coverage for different months share the limit as if for the
+  same, and married filing separately takes half the family limit even
+  when the spouse has no HSA. Excess contributions (Form 5329), excess
+  employer contributions, Archer MSAs, IRA funding distributions and
+  Part III (the testing period) aren't modeled.
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -130,20 +144,19 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 8889 and the HSA deduction
-2. Schedule C
-3. Schedule SE, self-employment tax and its deduction, and EIC Worksheet B
-4. Schedule 2: additional Medicare tax (Form 8959) and net investment
+1. Schedule C
+2. Schedule SE, self-employment tax and its deduction, and EIC Worksheet B
+3. Schedule 2: additional Medicare tax (Form 8959) and net investment
    income tax (Form 8960)
-5. Schedule D and Form 8949
-6. Schedule A, including the separate-return rule of IRC §63(c)(6)
-7. Schedule 3 credits (child care, Form 2441; education, Form 8863;
+4. Schedule D and Form 8949
+5. Schedule A, including the separate-return rule of IRC §63(c)(6)
+6. Schedule 3 credits (child care, Form 2441; education, Form 8863;
    saver's, Form 8880) and Credit Limit Worksheet A
-8. Form 8962, the premium tax credit
-9. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-10. Form 8995, the qualified business income deduction
-11. An EIC qualifying child who isn't your dependent (Form 8332)
-12. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+7. Form 8962, the premium tax credit
+8. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+9. Form 8995, the qualified business income deduction
+10. An EIC qualifying child who isn't your dependent (Form 8332)
+11. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
     instead of asking for them
-13. Form 8615 (kiddie tax) and Form 6251 (AMT)
-14. Tax year 2026 (Rev. Proc. 2025-32)
+12. Form 8615 (kiddie tax) and Form 6251 (AMT)
+13. Tax year 2026 (Rev. Proc. 2025-32)
