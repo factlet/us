@@ -41,9 +41,13 @@
        (or joint (not claimed-as-dependent))))
 
 ; A married couple files jointly, unless they've separated and the one
-; filing has a qualifying child.
-(def eligible :label "Can take the EIC" :cite "IRC §32(c)(1), (d), (i)"
+; filing has a qualifying child. A nonresident alien for any part of the
+; year can only file jointly, as a resident by choice.
+(def eligible :label "Can take the EIC" :cite "IRC §32(c)(1), (d), (i), (k)(1)"
   (and filers-have-ssns
+       (or joint (not you/nonresident-alien))
+       (not files-f2555)
+       (not eic-barred)
        (<= investment-income law/eic-investment-limit)
        (or joint (not qualifying-child-of-another))
        (or (!= filing-status 'married-separate) (and has-qualifying-child separated-spouse))

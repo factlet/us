@@ -174,3 +174,32 @@
   (expect f1040/line27a $0)
   (given spouse/tin 'ssn)
   (expect f1040/line27a $4,328))
+
+(test "a nonresident alien for part of the year takes it only on a joint return"
+  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (member w2s acme (given wages $8,000 withheld $0))
+  (empty f1099-ints f1099-divs dependents)
+  (expect f1040/line27a $614)
+  (given you/nonresident-alien true)
+  (expect f1040/line27a $0)
+  ; Filing jointly takes choosing to be treated as residents.
+  (given filing-status 'married-joint spouse/birth-date 1990-01-01 spouse/tin 'ssn)
+  (expect f1040/line27a $614))
+
+(test "filing Form 2555 rules it out"
+  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (member w2s acme (given wages $20,000 withheld $0))
+  (empty f1099-ints f1099-divs)
+  (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
+  (expect f1040/line27a $4,328)
+  (given files-f2555 true)
+  (expect f1040/line27a $0))
+
+(test "no credit while barred after a fraudulent or reckless claim"
+  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (member w2s acme (given wages $20,000 withheld $0))
+  (empty f1099-ints f1099-divs)
+  (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
+  (expect f1040/line27a $4,328)
+  (given eic-barred true)
+  (expect f1040/line27a $0))

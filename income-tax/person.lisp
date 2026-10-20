@@ -3,6 +3,10 @@
 (input birth-date : date :label "Date of birth")
 (input blind : bool :default false :label "Blind at the end of the year" :line 12d)
 (input tin : tin :label "Identification number issued by the return's due date")
+; Read only off a joint return: filing jointly with a nonresident alien
+; takes choosing to be treated as residents for the whole year.
+(input nonresident-alien : bool :default false
+  :label "A nonresident alien for any part of the year" :cite "IRC §32(c)(1)(D); §6013(a)(1), (g), (h)")
 
 ; Issued to a citizen or someone authorized to work, which is what the child
 ; tax credit and the senior deduction both mean by an SSN.

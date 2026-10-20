@@ -74,8 +74,11 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 - The earned income credit (line 27a): EIC Worksheet A, with the EIC
   Table's credit at the midpoint of each $50 row, and Steps 1–4 of the
   instructions for who can take it. That covers a valid SSN for every
-  filer, the investment income limit, the separated-spouse rule, and, for
-  filers without a qualifying child, the age, home and dependent rules.
+  filer, the investment income limit, the separated-spouse rule, Form
+  2555, nonresident aliens, the bans after a claim found fraudulent or
+  reckless, and, for filers without a qualifying child, the age, home and
+  dependent rules. After any other disallowance, it assumes Form 8862 is
+  attached to claim it again.
 
 ## Known gaps
 
@@ -86,9 +89,8 @@ These give wrong answers for returns they affect, so they come first:
 - A child who is your qualifying child for the EIC but not your dependent
   isn't counted: one you released to the other parent (Form 8332), or one
   who provided over half their own support.
-- The EIC doesn't ask about Form 2555, a nonresident alien filer, a past
-  disallowance (Form 8862), or a married head of household without a
-  qualifying child, all of which rule it out.
+- The EIC doesn't ask about a married head of household without a
+  qualifying child, which rules it out.
 
 ## Next
 

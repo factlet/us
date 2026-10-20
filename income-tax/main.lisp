@@ -44,6 +44,13 @@
 (input separated-spouse : bool :default false
   :label "You lived apart from your spouse for the last 6 months of the year, or were legally separated and apart at its end"
   :cite "IRC §32(d)(2)")
+(input files-f2555 : bool :default false
+  :label "You or your spouse are filing Form 2555, Foreign Earned Income" :cite "IRC §32(c)(1)(C)")
+; Counted from the year of the final determination; any other disallowance
+; only means attaching Form 8862 to claim it again.
+(input eic-barred : bool :default false
+  :label "A past EIC claim was found fraudulent within 10 years, or in reckless or intentional disregard of the rules within 2"
+  :cite "IRC §32(k)(1)")
 
 ; No credit for dependents unless every filer has a number by the due date,
 ; and none for a child unless a filer has a valid SSN.
