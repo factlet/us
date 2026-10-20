@@ -31,6 +31,10 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
+; Read only on a separate return, for social security benefits.
+(input lived-apart-all-year : bool :default false
+  :label "You lived apart from your spouse for all of the year" :line 6d
+  :cite "IRC §86(c)(1)(C)")
 
 ; Questions for the earned income credit. The form's own box asks whether
 ; your main home was in the United States (the 50 states and DC; military
@@ -112,6 +116,12 @@
   (input unemployment : usd :label "Unemployment compensation" :line 1)
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4))
 
+; Railroad retirement benefits treated as social security (Form RRB-1099,
+; boxes 5 and 10) go here too.
+(collection ssa1099s :label "Forms SSA-1099"
+  (input net-benefits : usd :label "Net benefits for the year" :line 5)
+  (input withheld : usd :default $0 :label "Voluntary federal income tax withheld" :line 6))
+
 ; What the lender received is what you paid, as long as it was on a
 ; qualified student loan you were legally obligated to pay.
 (collection f1098-es :label "Forms 1098-E"
@@ -121,6 +131,7 @@
 
 (module f1040 (include "forms/f1040.lisp"))
 (module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
+(module f1040-ssb (include "forms/f1040-ssb.lisp"))
 (module f1040-eic (include "forms/f1040-eic.lisp"))
 (module f1040s1 (include "forms/f1040s1.lisp"))
 (module f1040s1-sli (include "forms/f1040s1-sli.lisp"))

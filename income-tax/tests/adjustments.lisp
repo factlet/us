@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 withheld $6,000))
   (member f1098-es lender (given interest $3,000))
-  (empty f1099-ints f1099-divs f1099-gs dependents)
+  (empty f1099-ints f1099-divs f1099-gs ssa1099s dependents)
   (expect f1040s1-sli/line1 $2,500
           f1040s1-sli/line7 0
           f1040/line10 $2,500
@@ -18,7 +18,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $90,000 withheld $0))
   (member f1098-es lender (given interest $2,000))
-  (empty f1099-ints f1099-divs f1099-gs dependents)
+  (empty f1099-ints f1099-divs f1099-gs ssa1099s dependents)
   (expect f1040s1-sli/line4 $90,000
           f1040s1-sli/line7 0.333                    ; $5,000 ÷ $15,000
           f1040s1-sli/line8 $666
@@ -31,7 +31,7 @@
   (given filing-status 'married-joint)
   (member w2s acme (given wages $180,000 withheld $0))
   (member f1098-es lender (given interest $2,500))
-  (empty f1099-ints f1099-divs f1099-gs dependents)
+  (empty f1099-ints f1099-divs f1099-gs ssa1099s dependents)
   (expect f1040s1-sli/line7 0.333                    ; $10,000 ÷ $30,000
           f1040s1-sli/line8 $832.50
           f1040/line10 $1,667.50))
@@ -40,7 +40,7 @@
   (given filing-status 'married-separate)
   (member w2s acme (given wages $30,000 withheld $0))
   (member f1098-es lender (given interest $1,000))
-  (empty f1099-ints f1099-divs f1099-gs dependents)
+  (empty f1099-ints f1099-divs f1099-gs ssa1099s dependents)
   (expect f1040/line10 $0)
   (given filing-status 'single claimed-as-dependent true)
   (expect f1040/line10 $0)

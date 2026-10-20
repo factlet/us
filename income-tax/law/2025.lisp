@@ -7,6 +7,19 @@
 ; early, such as turning 65.
 (def day-after-year-end 2026-01-01)
 
+; ---- Income ----
+
+; Social security benefits are taxable once half of them plus other income
+; passes the base amount: half of what's over it, then 85% of what's over
+; the adjusted base amount, but never more than 85% of the benefits. These
+; aren't adjusted for inflation.
+(def ssb-base :cite "IRC §86(c)(1)"
+  (table filing-status married-joint $32,000 else $25,000))
+(def ssb-adjusted-base :cite "IRC §86(c)(2)"
+  (table filing-status married-joint $44,000 else $34,000))
+(def ssb-lower-rate :cite "IRC §86(a)(1)" 50%)
+(def ssb-upper-rate :cite "IRC §86(a)(2)" 85%)
+
 ; ---- Tax rates ----
 
 ; Each rate applies up to the edge after it.

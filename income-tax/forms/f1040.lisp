@@ -13,11 +13,15 @@
   (sum f1099-ints (+ interest treasury-interest)))
 (def line3a :label "Qualified dividends" :line 3a (sum f1099-divs qualified))
 (def line3b :label "Ordinary dividends" :line 3b (sum f1099-divs ordinary))
+(def line6a :label "Social security benefits" :line 6a f1040-ssb/line1)
+; With no benefits, or repayments over them, none are taxable.
+(def line6b :label "Taxable social security benefits" :line 6b :cite "IRC §86"
+  (if (> line6a $0) f1040-ssb/line18 $0))
 ; Capital gain distributions alone need no Schedule D.
 (def line7a :label "Capital gain" :line 7a (sum f1099-divs cap-gain))
 (def line8 :label "Additional income from Schedule 1" :line 8 f1040s1/line10)
 (def line9 :label "Total income" :line 9
-  (+ line1z line2b line3b line7a line8))                          ; + 4b 5b 6b
+  (+ line1z line2b line3b line6b line7a line8))                   ; + 4b 5b
 (def line10 :label "Adjustments to income from Schedule 1" :line 10 f1040s1/line26)
 (def line11a :label "Adjusted gross income" :line 11a :cite "IRC §62"
   (- line9 line10))
@@ -67,7 +71,8 @@
 
 (def line25a :label "Withholding from Forms W-2" :line 25a (sum w2s withheld))
 (def line25b :label "Withholding from Forms 1099" :line 25b
-  (+ (sum f1099-ints withheld) (sum f1099-divs withheld) (sum f1099-gs withheld)))
+  (+ (sum f1099-ints withheld) (sum f1099-divs withheld) (sum f1099-gs withheld)
+     (sum ssa1099s withheld)))
 (def line25d :label "Total withholding" :line 25d (+ line25a line25b))  ; + 25c
 ; A credit of zero settles it without asking who can take it, as Worksheet
 ; A stops when line 2 is zero.
