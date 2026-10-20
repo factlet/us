@@ -149,6 +149,15 @@
 
 ; ---- Other taxes ----
 
+; Self-employment tax is on 92.35% of the profit, once that's $400: 12.4%
+; up to what wages leave of the social security wage base, and 2.9% on all
+; of it.
+(def se-earnings-rate :cite "IRC §1402(a)(12)" 92.35%)
+(def se-minimum :cite "IRC §1402(b)(2)" $400)
+(def ss-wage-base :cite "IRC §1402(b)(1); Social Security Administration" $176,100)
+(def se-ss-rate :cite "IRC §1401(a)" 12.4%)
+(def se-medicare-rate :cite "IRC §1401(b)(1)" 2.9%)
+
 ; On the taxable part of a distribution from an IRA or retirement plan
 ; before age 59½, unless an exception applies.
 (def early-distribution-rate :cite "IRC §72(t)(1)" 10%)

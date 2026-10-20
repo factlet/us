@@ -55,7 +55,7 @@
 
 ; ---- Worksheet A ----
 
-(def line1 :label "Earned income" f1040/line1z)   ; − Medicaid waiver payments + combat pay
+(def line1 :label "Earned income" f1040-eic-b/line4b)
 (def line2 (credit-on line1))
 (def line3 :label "Adjusted gross income" f1040/line11a)
 ; Line 4 only spares looking up line 5 when it would repeat line 2.

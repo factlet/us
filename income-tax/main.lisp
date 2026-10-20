@@ -29,8 +29,9 @@
 (input filing-status : filing-status :label "Filing status")
 (def joint (= filing-status 'married-joint))
 
-(module you (include "person.lisp"))
-(module spouse (include "person.lisp"))   ; read only on a joint return
+; Each filer's own W-2s and businesses are the ones that match `is-spouse`.
+(module you (def is-spouse false) (include "person.lisp"))
+(module spouse (def is-spouse true) (include "person.lisp"))   ; read only on a joint return
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
@@ -96,9 +97,14 @@
   (def eic-child :label "Counts toward the EIC" :cite "IRC §32(c)(3)(D), (m)"
     (and eic-qualifying-child (= tin 'ssn))))
 
+; A statutory employee's W-2 goes on Schedule C instead.
 (collection w2s :label "Forms W-2"
+  (input spouses : bool :default false :label "Your spouse's W-2, on a joint return")
   (input wages : usd :label "Wages, tips, other compensation" :line 1)
   (input withheld : usd :label "Federal income tax withheld" :line 2)
+  ; Asked only of someone with self-employment income, for Schedule SE.
+  (input ss-wages : usd :label "Social security wages" :line 3)
+  (input ss-tips : usd :default $0 :label "Social security tips" :line 7)
   (input ss-withheld : usd :label "Social security tax withheld" :line 4)
   (input medicare-withheld : usd :label "Medicare tax withheld" :line 6))
 
@@ -156,12 +162,13 @@
 ; for figuring the deduction of someone covered by a retirement plan at
 ; work (Pub. 590-A, Appendix B, Worksheets 3 and 1).
 (module f1040-ssb
-  (def adjustments (+ f1040s1/line13 f1040s1/line20))             ; + 11 12 14–19 23 25
+  (def adjustments (+ f1040s1/line13 f1040s1/line15 f1040s1/line20)) ; + 11 12 14 16–19 23 25
   (include "forms/f1040-ssb.lisp"))
 (module p590a-ssb
-  (def adjustments f1040s1/line13)                                ; + 11 12 14–19 23 25
+  (def adjustments (+ f1040s1/line13 f1040s1/line15))             ; + 11 12 14 16–19 23 25
   (include "forms/f1040-ssb.lisp"))
 (module f1040-eic (include "forms/f1040-eic.lisp"))
+(module f1040-eic-b (include "forms/f1040-eic-b.lisp"))
 (module f1040s1 (include "forms/f1040s1.lisp"))
 (module f1040s1-ira (include "forms/f1040s1-ira.lisp"))
 (module f1040s1-sli (include "forms/f1040s1-sli.lisp"))

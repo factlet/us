@@ -24,7 +24,10 @@
 (def line16a :label "Credit not allowed by the tax limit" (- line12 line14))
 (def line16b (* line4 law/actc-per-child))
 (def line17 (min line16a line16b))
-(def line18a :label "Earned income" f1040/line1z)
+; EIC Worksheet B's, whether or not the EIC is taken: without farm income,
+; combat pay or Medicaid waiver payments, the Earned Income Worksheet
+; comes to the same.
+(def line18a :label "Earned income" f1040-eic-b/line4b)
 (def line19 (excess line18a law/actc-earned-floor))
 (def line20 (* law/actc-rate line19))
 
@@ -32,7 +35,8 @@
 
 (def line21 :label "Withheld social security and Medicare taxes"
   (sum w2s (+ ss-withheld medicare-withheld)))
-(def line23 line21)                                             ; + 22
+(def line22 :label "One-half of self-employment tax" f1040s1/line15) ; + Schedule 2 lines 5 6 13
+(def line23 (+ line21 line22))
 (def line24 :label "Earned income credit" f1040/line27a)        ; + Schedule 3 line 11
 (def line25 (excess line23 line24))
 (def line26 (max line20 line25))

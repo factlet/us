@@ -49,3 +49,5 @@
   :label "Your taxable HSA distributions were all made after you turned 65 or became disabled"
   :line 17a :cite "IRC §223(f)(4)(B), (C)")
 (module f8889 (include "forms/f8889.lisp"))
+
+(module f1040sse (include "forms/f1040sse.lisp"))
