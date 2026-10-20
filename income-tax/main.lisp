@@ -35,6 +35,11 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
+; Read only on a separate return, for the child and dependent care credit
+; (Form 2441, line A).
+(input considered-unmarried : bool :default false
+  :label "You lived apart from your spouse the last 6 months of the year, in a home that was the qualifying person's for more than half the year and whose upkeep you paid more than half of"
+  :cite "IRC §21(e)(4)")
 (input spouse-itemizes : bool :default false
   :label "Married filing separately, and your spouse itemizes deductions" :line 12b
   :cite "IRC §63(c)(6)(A)")
@@ -82,6 +87,15 @@
   (input lived-abroad : bool :default false
     :label "Lived with you outside the United States for more than half the year"
     :cite "IRC §32(c)(3)(C)")
+  ; For the child and dependent care credit (Form 2441, line 2).
+  (input disabled : bool :default false
+    :label "Not physically or mentally able to care for themselves" :cite "IRC §21(b)(1)")
+  (input care-expenses : usd :default $0
+    :label "Care expenses you paid for them so you could work" :cite "IRC §21(b)(2)")
+  ; Under 13 for some of the year: expenses only for that part count.
+  (def care-person :label "A qualifying person for the child and dependent care credit"
+    :cite "IRC §21(b)(1)"
+    (or (and qualifying-child (< (age-on birth-date law/year-start) 13)) disabled))
   ; A child turns 17 on their 17th birthday (Rev. Rul. 2003-72), so one
   ; born after 2008-12-31 is under 17 at the end of 2025.
   (def ctc-child :label "Qualifies for the child tax credit" :cite "IRC §24(c), (e), (h)(7)"
@@ -110,7 +124,8 @@
   (input ss-tips : usd :default $0 :label "Social security tips" :line 7)
   (input ss-withheld : usd :label "Social security tax withheld" :line 4)
   (input medicare-wages : usd :label "Medicare wages and tips" :line 5)
-  (input medicare-withheld : usd :label "Medicare tax withheld" :line 6))
+  (input medicare-withheld : usd :label "Medicare tax withheld" :line 6)
+  (input dependent-care : usd :default $0 :label "Dependent care benefits" :line 10))
 
 (collection f1099-ints :label "Forms 1099-INT"
   (input interest : usd :label "Interest income" :line 1)
@@ -198,7 +213,9 @@
 (module f1040s1-sli (include "forms/f1040s1-sli.lisp"))
 (module f1040s1a (include "forms/f1040s1a.lisp"))
 (module f1040s2 (include "forms/f1040s2.lisp"))
+(module f1040s3 (include "forms/f1040s3.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))
+(module f2441 (include "forms/f2441.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))

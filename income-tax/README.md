@@ -22,7 +22,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -125,6 +125,14 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   lacks one falls back to the $500 credit, and every filer needs some
   number by the due date (IRC §24(e), (h)(4)(C), (h)(7)). A dependent who
   isn't a U.S. citizen, national or resident alien gets neither credit.
+- Form 2441 and Schedule 3: the credit for child and dependent care
+  expenses, 35% down to 20% by AGI, of up to $3,000 ($6,000 for two or more)
+  of care for a child under 13 or a disabled dependent. It's no more than
+  the lower earner's earned income, which is at least $250 or $500 a month
+  for a student or disabled spouse, and on a separate return only when
+  considered unmarried. Employer dependent care benefits are excluded up
+  to $5,000, the rest taxable as wages. The child tax credit then takes
+  what's left of the tax (Credit Limit Worksheet A).
 - The earned income credit (line 27a): EIC Worksheets A and B, with the EIC
   Table's credit at the midpoint of each $50 row, and Steps 1–4 of the
   instructions for who can take it. That covers a valid SSN for every
@@ -179,6 +187,13 @@ These give wrong answers for returns they affect, so they come first:
   unrecaptured section 1250 gain, so no Schedule D Tax Worksheet; no gains
   from Forms 4797, 6252 or Schedules K-1; and doesn't figure the loss to
   carry over to next year.
+- For the child and dependent care credit, a disabled spouse isn't a
+  qualifying person, and two spouses who were students in the same month
+  both get the deemed $250. Married filing separately and not considered
+  unmarried takes your own earned income for your spouse's (line 19).
+  Expenses for 2024 paid in 2025 (line 9b) and benefits carried over or
+  forfeited (lines 13 and 14) aren't asked about, and earned income for
+  lines 4 and 5 leaves out taxable benefits (line 1e).
 - Net investment income leaves out annuities, rents, royalties and
   passive income, and isn't reduced by investment expenses (Form 8960
   Part II). The Additional Medicare Tax leaves out railroad retirement
@@ -193,13 +208,13 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule 3 credits (child care, Form 2441; education, Form 8863;
-   saver's, Form 8880) and Credit Limit Worksheet A
-2. Form 8962, the premium tax credit
-3. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-4. Form 8995, the qualified business income deduction
-5. An EIC qualifying child who isn't your dependent (Form 8332)
-6. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Schedule 3: education credits (Form 8863)
+2. Schedule 3: the saver's credit (Form 8880)
+3. Form 8962, the premium tax credit
+4. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+5. Form 8995, the qualified business income deduction
+6. An EIC qualifying child who isn't your dependent (Form 8332)
+7. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-7. Form 8615 (kiddie tax) and Form 6251 (AMT)
-8. Tax year 2026 (Rev. Proc. 2025-32)
+8. Form 8615 (kiddie tax) and Form 6251 (AMT)
+9. Tax year 2026 (Rev. Proc. 2025-32)

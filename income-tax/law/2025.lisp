@@ -2,6 +2,7 @@
 ; amended by P.L. 119-21 (2025-07-04) for the standard deduction, the child
 ; tax credit and the new senior deduction.
 
+(def year-start 2025-01-01)
 (def year-end 2025-12-31)
 ; Ages "at the end of the year" for rules where a birthday counts a day
 ; early, such as turning 65.
@@ -131,6 +132,22 @@
 (def senior-phaseout-rate :cite "IRC §151(d)(5)(C)(ii)" 6%)
 
 ; ---- Credits ----
+
+; Child and dependent care: a share of up to $3,000 of expenses for one
+; qualifying person, or $6,000 for two or more. The share is 35%, less 1%
+; for each $2,000 or part of it of AGI over $15,000, down to 20%. A month
+; as a student or unable to care for oneself counts as $250 of earned
+; income, or $500 with two or more. Employer benefits are excluded up to
+; $5,000, or $2,500 on a separate return.
+(def care-expense-limit :cite "IRC §21(c)" [$3,000 $6,000])
+(def care-rate-max :cite "IRC §21(a)(2)" 35%)
+(def care-rate-min :cite "IRC §21(a)(2)" 20%)
+(def care-phaseout-start :cite "IRC §21(a)(2)" $15,000)
+(def care-phaseout-step :cite "IRC §21(a)(2)" $2,000)
+(def care-deemed-income :cite "IRC §21(d)(2)" [$250 $500])
+(def care-benefits-limit :cite "IRC §129(a)(2)(A)" $5,000)
+(def care-benefits-limit-separate :cite "IRC §129(a)(2)(A)" $2,500)
+
 
 (def ctc-per-child :cite "IRC §24(h)(2); P.L. 119-21 §70104" $2,200)
 (def odc-per-dependent :cite "IRC §24(h)(4)" $500)

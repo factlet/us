@@ -6,7 +6,8 @@
 ; ---- Income ----
 
 (def line1a :label "Wages from Forms W-2" :line 1a (sum w2s wages))
-(def line1z :label "Total wages" :line 1z line1a)                ; + 1b–1h
+(def line1e :label "Taxable dependent care benefits" :line 1e f2441/line26)
+(def line1z :label "Total wages" :line 1z (+ line1a line1e))     ; + 1b–1d 1f–1h
 (def line2a :label "Tax-exempt interest" :line 2a
   (+ (sum f1099-ints tax-exempt-interest) (sum f1099-divs exempt-interest)))
 (def line2b :label "Taxable interest" :line 2b
@@ -79,7 +80,8 @@
 (def line18 :line 18 line16)                                      ; + 17
 (def line19 :label "Child tax credit or credit for other dependents" :line 19
   f1040s8/line14)
-(def line21 :line 21 line19)                                      ; + 20
+(def line20 :label "Amount from Schedule 3" :line 20 f1040s3/line8)
+(def line21 :line 21 (+ line19 line20))
 (def line22 :line 22 (excess line18 line21))
 (def line23 :label "Other taxes from Schedule 2" :line 23 f1040s2/line21)
 (def line24 :label "Total tax" :line 24 (+ line22 line23))

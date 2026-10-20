@@ -51,3 +51,17 @@
 (module f8889 (include "forms/f8889.lisp"))
 
 (module f1040sse (include "forms/f1040sse.lisp"))
+
+; Earned income for the child and dependent care credit and benefits (Form
+; 2441, lines 4, 5, 18 and 19): this person's own wages and statutory
+; employee income, and self-employment less the half of its tax deducted.
+; A month as a full-time student, or unable to care for oneself, counts as
+; at least $250, or $500 with two or more qualifying persons (line B).
+(input care-deemed-months : number :default 0
+  :label "Months you were a full-time student or unable to care for yourself"
+  :cite "IRC §21(d)(2)")
+(def earned-income :label "Earned income" :cite "IRC §21(d)"
+  (max (+ (sum w2s (if (= spouses is-spouse) wages $0))
+          (sum f1040scs (if (and statutory-employee (= spouses is-spouse)) receipts $0))
+          (- f1040sse/line3 f1040sse/line13))
+       (* care-deemed-months f2441/deemed-income)))
