@@ -1,7 +1,10 @@
 ; US federal individual income tax, tax year 2025.
 ;
 ; A form's lines are named after the line they fill: `f1040/line11a` is
-; Form 1040, line 11a.
+; Form 1040, line 11a. A form is named by its IRS identifier (`f1040`,
+; `f1040sd`), and a worksheet by its form's plus a short name for it
+; (`f1040-qdcg`: the Form 1040 instructions' Qualified Dividends and
+; Capital Gain Tax Worksheet).
 
 (unit usd :prefix "$" :places 2)
 
@@ -15,8 +18,24 @@
 (input filing-status : filing-status :label "Filing status")
 
 (collection w2s :label "Forms W-2"
-  (input wages : usd :label "Wages, tips, other compensation" :line 1))
+  (input wages : usd :label "Wages, tips, other compensation" :line 1)
+  (input withheld : usd :label "Federal income tax withheld" :line 2))
+
+(collection f1099-ints :label "Forms 1099-INT"
+  (input interest : usd :label "Interest income" :line 1)
+  (input treasury-interest : usd :default $0
+    :label "Interest on U.S. Savings Bonds and Treasury obligations" :line 3)
+  (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
+  (input tax-exempt-interest : usd :default $0 :label "Tax-exempt interest" :line 8))
+
+(collection f1099-divs :label "Forms 1099-DIV"
+  (input ordinary : usd :label "Total ordinary dividends" :line 1a)
+  (input qualified : usd :default $0 :label "Qualified dividends" :line 1b)
+  (input cap-gain : usd :default $0 :label "Total capital gain distributions" :line 2a)
+  (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
+  (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12))
 
 (module law (include "law/2025.lisp"))
 
 (module f1040 (include "forms/f1040.lisp"))
+(module f1040-qdcg (include "forms/f1040-qdcg.lisp"))

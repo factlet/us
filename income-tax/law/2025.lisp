@@ -13,6 +13,20 @@
     head-of-household
     [10% $17,000  12% $64,850  22% $103,350  24% $197,300  32% $250,500  35% $626,350  37%]))
 
+; Qualified dividends and net capital gain are taxed at 0% up to the first
+; amount, 15% up to the second, and 20% above.
+(def cg-0%-top :cite "IRC §1(j)(5)(B)(i); Rev. Proc. 2024-40 §3.03"
+  (table filing-status
+    (single married-separate)                   $48,350
+    (married-joint qualifying-surviving-spouse) $96,700
+    head-of-household                           $64,750))
+(def cg-15%-top :cite "IRC §1(j)(5)(B)(ii); Rev. Proc. 2024-40 §3.03"
+  (table filing-status
+    single                                      $533,400
+    (married-joint qualifying-surviving-spouse) $600,050
+    married-separate                            $300,000
+    head-of-household                           $566,700))
+
 (def std-deduction :cite "IRC §63(c)(2); P.L. 119-21 §70102"
   (table filing-status
     (single married-separate)                   $15,750
