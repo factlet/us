@@ -35,6 +35,18 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
+; For whether your American opportunity credit can be refundable (Form 8863,
+; line 7): not if you're under 24 and supported much like a dependent.
+(input full-time-student : bool :default false
+  :label "You were a full-time student for some part of 5 months of the year"
+  :cite "IRC §25A(i)(5)(B)")
+(input supported : bool :default false
+  :label "Your earned income was less than half of your own support"
+  :cite "IRC §25A(i)(5)(B), §1(g)(2)(A)")
+(input parents-deceased : bool :default false
+  :label "Neither of your parents was alive at the end of the year"
+  :cite "IRC §25A(i)(5)(B), §1(g)(2)(B)")
+
 ; Read only on a separate return, for the child and dependent care credit
 ; (Form 2441, line A).
 (input considered-unmarried : bool :default false
@@ -96,6 +108,21 @@
   (def care-person :label "A qualifying person for the child and dependent care credit"
     :cite "IRC §21(b)(1)"
     (or (and qualifying-child (< (age-on birth-date law/year-start) 13)) disabled))
+  ; As a student, for an education credit (Form 8863, Part III, lines 23
+  ; through 31).
+  (input education-expenses : usd :default $0
+    :label "Adjusted qualified education expenses paid for them" :cite "IRC §25A(f)")
+  (input aotc-four-years : bool :default false
+    :label "The American opportunity credit was claimed for them for 4 earlier years" :line 23)
+  (input less-than-half-time : bool :default false
+    :label "Not enrolled at least half-time toward a degree or credential" :line 24)
+  (input four-years-done : bool :default false
+    :label "Finished the first 4 years of postsecondary education before this year" :line 25)
+  (input drug-felony : bool :default false
+    :label "Convicted of a felony for a controlled substance" :line 26)
+  (def aotc-student :label "Takes the American opportunity credit" :cite "IRC §25A(b)(2)"
+    (and (> education-expenses $0) (!= tin 'no-tin) (not aotc-four-years)
+         (not less-than-half-time) (not four-years-done) (not drug-felony)))
   ; A child turns 17 on their 17th birthday (Rev. Rul. 2003-72), so one
   ; born after 2008-12-31 is under 17 at the end of 2025.
   (def ctc-child :label "Qualifies for the child tax credit" :cite "IRC §24(c), (e), (h)(7)"
@@ -216,6 +243,7 @@
 (module f1040s3 (include "forms/f1040s3.lisp"))
 (module f1040s8 (include "forms/f1040s8.lisp"))
 (module f2441 (include "forms/f2441.lisp"))
+(module f8863 (include "forms/f8863.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))

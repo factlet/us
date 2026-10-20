@@ -22,7 +22,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -133,6 +133,14 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   considered unmarried. Employer dependent care benefits are excluded up
   to $5,000, the rest taxable as wages. The child tax credit then takes
   what's left of the tax (Credit Limit Worksheet A).
+- Form 8863: the education credits for you, your spouse or a dependent.
+  The American opportunity credit is all of the first $2,000 of a
+  student's expenses and 25% of the next $2,000, for a student eligible on
+  Part III's questions, with 40% refundable unless you're under 24 and
+  supported like a dependent. Otherwise, the lifetime learning credit is
+  20% of up to $10,000 on the return. Both phase out from $80,000
+  ($160,000 joint), and aren't for a separate return or someone another
+  taxpayer can claim.
 - The earned income credit (line 27a): EIC Worksheets A and B, with the EIC
   Table's credit at the midpoint of each $50 row, and Steps 1–4 of the
   instructions for who can take it. That covers a valid SSN for every
@@ -208,13 +216,12 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule 3: education credits (Form 8863)
-2. Schedule 3: the saver's credit (Form 8880)
-3. Form 8962, the premium tax credit
-4. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-5. Form 8995, the qualified business income deduction
-6. An EIC qualifying child who isn't your dependent (Form 8332)
-7. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Schedule 3: the saver's credit (Form 8880)
+2. Form 8962, the premium tax credit
+3. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+4. Form 8995, the qualified business income deduction
+5. An EIC qualifying child who isn't your dependent (Form 8332)
+6. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-8. Form 8615 (kiddie tax) and Form 6251 (AMT)
-9. Tax year 2026 (Rev. Proc. 2025-32)
+7. Form 8615 (kiddie tax) and Form 6251 (AMT)
+8. Tax year 2026 (Rev. Proc. 2025-32)

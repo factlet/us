@@ -16,7 +16,7 @@
 (def line12 (excess line8 line11))
 ; Credit Limit Worksheet A: tax less other nonrefundable credits.
 (def line13 :label "Credit limit"
-  (excess f1040/line18 f1040s3/line2))                           ; − Schedule 3 lines 1 3 4 5b 6d 6f 6l 6m
+  (excess f1040/line18 (+ f1040s3/line2 f1040s3/line3)))        ; − Schedule 3 lines 1 4 5b 6d 6f 6l 6m
 (def line14 :label "Child tax credit and credit for other dependents"
   (min line12 line13))
 

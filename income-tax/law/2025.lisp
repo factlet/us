@@ -148,6 +148,22 @@
 (def care-benefits-limit :cite "IRC §129(a)(2)(A)" $5,000)
 (def care-benefits-limit-separate :cite "IRC §129(a)(2)(A)" $2,500)
 
+; Education credits: the American opportunity credit is all of a student's
+; first $2,000 of expenses and 25% of the next $2,000, with 40% of it
+; refundable; the lifetime learning credit is 20% of up to $10,000 of
+; expenses on the return. Both phase out over the range below the end, by
+; modified AGI. None of these are adjusted for inflation.
+(def aotc-first :cite "IRC §25A(b)(1)(A)" $2,000)
+(def aotc-second :cite "IRC §25A(b)(1)(B)" $2,000)
+(def aotc-second-rate :cite "IRC §25A(b)(1)(B)" 25%)
+(def aotc-refundable-rate :cite "IRC §25A(i)(5)" 40%)
+(def llc-expense-limit :cite "IRC §25A(c)(1)" $10,000)
+(def llc-rate :cite "IRC §25A(c)(1)" 20%)
+(def education-phaseout-end :cite "IRC §25A(d), (i)(4)"
+  (table filing-status married-joint $180,000 else $90,000))
+(def education-phaseout-range :cite "IRC §25A(d), (i)(4)"
+  (table filing-status married-joint $20,000 else $10,000))
+
 
 (def ctc-per-child :cite "IRC §24(h)(2); P.L. 119-21 §70104" $2,200)
 (def odc-per-dependent :cite "IRC §24(h)(4)" $500)

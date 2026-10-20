@@ -52,6 +52,22 @@
 
 (module f1040sse (include "forms/f1040sse.lisp"))
 
+; As a student, for an education credit (Form 8863, Part III, lines 23
+; through 31), as for a dependent.
+(input education-expenses : usd :default $0
+  :label "Adjusted qualified education expenses paid for you" :cite "IRC §25A(f)")
+(input aotc-four-years : bool :default false
+  :label "The American opportunity credit was claimed for you for 4 earlier years" :line 23)
+(input less-than-half-time : bool :default false
+  :label "Not enrolled at least half-time toward a degree or credential" :line 24)
+(input four-years-done : bool :default false
+  :label "Finished the first 4 years of postsecondary education before this year" :line 25)
+(input drug-felony : bool :default false
+  :label "Convicted of a felony for a controlled substance" :line 26)
+(def aotc-student :label "Takes the American opportunity credit" :cite "IRC §25A(b)(2)"
+  (and (> education-expenses $0) (!= tin 'no-tin) (not aotc-four-years)
+       (not less-than-half-time) (not four-years-done) (not drug-felony)))
+
 ; Earned income for the child and dependent care credit and benefits (Form
 ; 2441, lines 4, 5, 18 and 19): this person's own wages and statutory
 ; employee income, and self-employment less the half of its tax deducted.

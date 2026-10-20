@@ -99,8 +99,9 @@
 (def line27a :label "Earned income credit" :line 27a :cite "IRC §32"
   (if (and (> f1040-eic/line6 $0) f1040-eic/eligible) f1040-eic/line6 $0))
 (def line28 :label "Additional child tax credit" :line 28 f1040s8/line27)
+(def line29 :label "American opportunity credit" :line 29 f8863/line8)
 (def line32 :label "Other payments and refundable credits" :line 32
-  (+ line27a line28))                                             ; + 29 30 31
+  (+ line27a line28 line29))                                      ; + 30 31
 (def line33 :label "Total payments" :line 33 (+ line25d line32))  ; + 26
 (def line34 :label "Overpaid" :line 34 (excess line33 line24))
 (def line37 :label "Amount you owe" :line 37 (excess line24 line33))
