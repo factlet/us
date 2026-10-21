@@ -3,11 +3,16 @@
 ; Married filing separately takes the credit only when considered
 ; unmarried for it (line A).
 (def eligible (or (!= filing-status 'married-separate) considered-unmarried))
-(def persons :label "Qualifying persons" (count dependents care-person))
+; Dependents, and children whose claim you released as the custodial parent.
+(def persons :label "Qualifying persons"
+  (+ (count dependents care-person)
+     (if nondependent-child (count nondependent-children care-person) 0)))
 (def two-or-more (>= persons 2))
 (def deemed-income (nth law/care-deemed-income (if two-or-more 1 0)))
 (def expense-limit (nth law/care-expense-limit (if two-or-more 1 0)))
-(def expenses :label "Qualified expenses" (sum dependents (if care-person care-expenses $0)))
+(def expenses :label "Qualified expenses"
+  (+ (sum dependents (if care-person care-expenses $0))
+     (if nondependent-child (sum nondependent-children (if care-person care-expenses $0)) $0)))
 
 ; ---- Part II: Credit for child and dependent care expenses ----
 

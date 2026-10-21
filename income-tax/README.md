@@ -19,7 +19,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents` and `nondependent-children`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
 | `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
@@ -182,6 +182,12 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   reckless, and, for filers without a qualifying child, the age, home and
   dependent rules. After any other disallowance, it assumes Form 8862 is
   attached to claim it again.
+- Children of divorced or separated parents (Form 8332). A child the
+  custodial parent released to you is your dependent for the child tax
+  credit, but not for the EIC or the child and dependent care credit. The
+  custodial parent keeps both, for a child listed among the qualifying
+  children who aren't dependents. That list also takes a child who
+  provided over half their own support, who counts for the EIC only.
 
 ## Known gaps
 
@@ -202,9 +208,10 @@ These give wrong answers for returns they affect, so they come first:
   contributions aren't carried to Form 8606. The saver's credit counts a
   spouse's distributions in both columns even from a year you didn't
   file jointly.
-- A child who is your qualifying child for the EIC but not your dependent
-  isn't counted: one you released to the other parent (Form 8332), or one
-  who provided over half their own support.
+- Whether a child is your qualifying child is asked, not figured: the
+  relationship, age, residency and support tests, and the tie-breaker
+  rules for a child who is the qualifying child of more than one person,
+  are left to the answer.
 - A Form 1099-R is taxed at its box 2a amount less rollovers. There's no
   Form 8606 for IRA basis or Roth distributions, no Simplified Method for
   a pension whose payer didn't figure the taxable amount, and no qualified
@@ -273,9 +280,8 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. An EIC qualifying child who isn't your dependent (Form 8332)
-2. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-3. Form 8615 (kiddie tax) and Form 6251 (AMT)
-4. Form 8995-A, above the qualified business income threshold
-5. Tax year 2026 (Rev. Proc. 2025-32)
+2. Form 8615 (kiddie tax) and Form 6251 (AMT)
+3. Form 8995-A, above the qualified business income threshold
+4. Tax year 2026 (Rev. Proc. 2025-32)

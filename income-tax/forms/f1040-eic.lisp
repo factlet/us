@@ -1,7 +1,9 @@
 ; Earned Income Credit Worksheet A (Form 1040 instructions, line 27a), and
 ; the steps before it that decide who can take the credit. IRC §32.
 
-(def children :label "Qualifying children with a valid SSN" (count dependents eic-child))
+(def children :label "Qualifying children with a valid SSN"
+  (+ (count dependents eic-child)
+     (if nondependent-child (count nondependent-children eic-child) 0)))
 (def column (min children 3))                 ; the table's last is three or more
 
 ; The EIC Table figures the credit at the middle of each $50 row, to the
@@ -26,7 +28,8 @@
 ; Having one skips the rules for filers without, even if the child doesn't
 ; count for want of an SSN.
 (def has-qualifying-child :cite "IRC §32(c)(1)(A)(i)"
-  (any dependents eic-qualifying-child))
+  (or (any dependents eic-qualifying-child)
+      (and nondependent-child (any nondependent-children eic-qualifying-child))))
 
 ; 25 to 64 at the end of the year. Turning 25 counts a day early, as
 ; turning 65 does for the standard deduction, but turning 65 here doesn't:

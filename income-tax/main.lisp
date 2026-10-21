@@ -101,6 +101,13 @@
   (input lived-abroad : bool :default false
     :label "Lived with you outside the United States for more than half the year"
     :cite "IRC §32(c)(3)(C)")
+  ; A noncustodial parent's child by the custodial parent's release is a
+  ; dependent for the child tax credit, but not a qualifying child for the
+  ; EIC or a qualifying person for the child and dependent care credit,
+  ; which stay with the custodial parent.
+  (input released-to-you : bool :default false
+    :label "Your child as the noncustodial parent: the custodial parent released the claim to you (Form 8332)"
+    :cite "IRC §152(e)")
   ; For the child and dependent care credit (Form 2441, line 2).
   (input disabled : bool :default false
     :label "Not physically or mentally able to care for themselves" :cite "IRC §21(b)(1)")
@@ -108,8 +115,9 @@
     :label "Care expenses you paid for them so you could work" :cite "IRC §21(b)(2)")
   ; Under 13 for some of the year: expenses only for that part count.
   (def care-person :label "A qualifying person for the child and dependent care credit"
-    :cite "IRC §21(b)(1)"
-    (or (and qualifying-child (< (age-on birth-date law/year-start) 13)) disabled))
+    :cite "IRC §21(b)(1), (e)(5)"
+    (and (not released-to-you)
+         (or (and qualifying-child (< (age-on birth-date law/year-start) 13)) disabled)))
   ; As a student, for an education credit (Form 8863, Part III, lines 23
   ; through 31).
   (input education-expenses : usd :default $0
@@ -143,7 +151,35 @@
   ; without a valid SSN is still your qualifying child, but isn't counted
   ; toward the credit.
   (def eic-qualifying-child :label "Your qualifying child for the EIC" :cite "IRC §32(c)(3)"
-    (and qualifying-child (not lived-abroad)))
+    (and qualifying-child (not released-to-you) (not lived-abroad)))
+  (def eic-child :label "Counts toward the EIC" :cite "IRC §32(c)(3)(D), (m)"
+    (and eic-qualifying-child (= tin 'ssn))))
+
+; Qualifying children you don't claim as dependents, listed only on
+; Schedule EIC: one whose claim you released to the other parent as the
+; custodial parent, or one who provided over half of their own support.
+; The EIC ignores both rules, and the child and dependent care credit the
+; first. A married child counts only if released.
+(input nondependent-child : bool :default false
+  :label "A qualifying child lived with you whom you aren't claiming as a dependent"
+  :cite "IRC §32(c)(3)(A), (B)")
+(collection nondependent-children :label "Qualifying children who aren't your dependents"
+  (input birth-date : date :label "Date of birth")
+  (input tin : tin :label "Identification number issued by the return's due date")
+  (input released : bool :default false
+    :label "You released your claim to them to the other parent (Form 8332)" :cite "IRC §152(e)")
+  (input lived-abroad : bool :default false
+    :label "Lived with you outside the United States for more than half the year"
+    :cite "IRC §32(c)(3)(C)")
+  (input disabled : bool :default false
+    :label "Not physically or mentally able to care for themselves" :cite "IRC §21(b)(1)")
+  (input care-expenses : usd :default $0
+    :label "Care expenses you paid for them so you could work" :cite "IRC §21(b)(2)")
+  (def care-person :label "A qualifying person for the child and dependent care credit"
+    :cite "IRC §21(e)(5)"
+    (and released (or (< (age-on birth-date law/year-start) 13) disabled)))
+  (def eic-qualifying-child :label "Your qualifying child for the EIC" :cite "IRC §32(c)(3)"
+    (not lived-abroad))
   (def eic-child :label "Counts toward the EIC" :cite "IRC §32(c)(3)(D), (m)"
     (and eic-qualifying-child (= tin 'ssn))))
 
