@@ -19,10 +19,10 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`); and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`); and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -146,6 +146,16 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   distributions since 2023; not for someone under 18, a full-time
   student, or someone another taxpayer can claim. Schedule 3's credits
   come in the form's order, each limited by the tax the ones before leave.
+- Form 8962: the premium tax credit for Marketplace coverage. Household
+  income (AGI with tax-exempt interest, untaxed social security and
+  dependents who must file) as a share of the 2024 poverty line for the
+  tax family sets the applicable figure, from 0% at 150% to 8.5% from
+  400% with no cliff. The credit is the benchmark plan's premium less that
+  contribution, no more than the premiums, for the whole year or for the
+  months covered. Net of advance payments, it goes on Schedule 3 line 9;
+  excess advance payments are repaid on Schedule 2 line 1a, up to Table
+  5's limit below 400%. Not for someone claimed as a dependent, nor
+  separately without the abuse or abandonment exception.
 - The earned income credit (line 27a): EIC Worksheets A and B, with the EIC
   Table's credit at the midpoint of each $50 row, and Steps 1–4 of the
   instructions for who can take it. That covers a valid SSN for every
@@ -213,6 +223,13 @@ These give wrong answers for returns they affect, so they come first:
   passive income, and isn't reduced by investment expenses (Form 8960
   Part II). The Additional Medicare Tax leaves out railroad retirement
   compensation.
+- The premium tax credit takes every Form 1095-A as covering the same
+  months at the same amounts each month, instead of lines 12 through 23
+  month by month. It doesn't allocate a policy shared with another
+  taxpayer (Part IV), use the alternative calculation for the year of
+  marriage (Part V), or interact with the self-employed health insurance
+  deduction. Household income under 100% of the poverty line is taken as
+  eligible whenever advance payments were made.
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -223,11 +240,10 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 8962, the premium tax credit
-2. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-3. Form 8995, the qualified business income deduction
-4. An EIC qualifying child who isn't your dependent (Form 8332)
-5. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
+2. Form 8995, the qualified business income deduction
+3. An EIC qualifying child who isn't your dependent (Form 8332)
+4. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-6. Form 8615 (kiddie tax) and Form 6251 (AMT)
-7. Tax year 2026 (Rev. Proc. 2025-32)
+5. Form 8615 (kiddie tax) and Form 6251 (AMT)
+6. Tax year 2026 (Rev. Proc. 2025-32)

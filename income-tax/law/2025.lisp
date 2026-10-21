@@ -148,6 +148,24 @@
 (def care-benefits-limit :cite "IRC §129(a)(2)(A)" $5,000)
 (def care-benefits-limit-separate :cite "IRC §129(a)(2)(A)" $2,500)
 
+; Premium tax credit: the 2024 federal poverty line for one, and for each
+; person more, by where you lived.
+(def poverty-line :cite "IRC §36B(d)(3); HHS poverty guidelines for 2024"
+  (table residence states-dc $15,060 alaska $18,810 hawaii $17,310))
+(def poverty-line-per-person :cite "IRC §36B(d)(3); HHS poverty guidelines for 2024"
+  (table residence states-dc $5,380 alaska $6,730 hawaii $6,190))
+; The share of household income expected toward the benchmark plan, from
+; 0% at 150% of the poverty line to 8.5% from 400%, in straight lines
+; between the points (as amended through 2025).
+(def ptc-percentages :cite "IRC §36B(b)(3)(A)(iii)" [150 200 250 300 400])
+(def ptc-figures :cite "IRC §36B(b)(3)(A)(iii)" [0 0.02 0.04 0.06 0.085])
+; Excess advance payments to repay at most, below 200%, 300% and 400% of
+; the poverty line; past it, all of them.
+(def aptc-repayment-limits :cite "IRC §36B(f)(2)(B)"
+  (table filing-status
+    single [$375 $975 $1,625]
+    else   [$750 $1,950 $3,250]))
+
 ; Education credits: the American opportunity credit is all of a student's
 ; first $2,000 of expenses and 25% of the next $2,000, with 40% of it
 ; refundable; the lifetime learning credit is 20% of up to $10,000 of

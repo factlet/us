@@ -23,6 +23,10 @@
 ; Coverage under a high-deductible health plan, for an HSA.
 (enum hdhp no-hdhp self-only family)
 
+; Where you lived, for the federal poverty line: Alaska's and Hawaii's are
+; higher than the rest of the country's.
+(enum residence states-dc alaska hawaii)
+
 ; The form's "subtract b from a; if zero or less, enter -0-".
 (defn excess [a : usd b : usd] (max $0 (- a b)))
 
@@ -121,6 +125,10 @@
   (def aotc-student :label "Takes the American opportunity credit" :cite "IRC §25A(b)(2)"
     (and (> education-expenses $0) (!= tin 'no-tin) (not aotc-four-years)
          (not less-than-half-time) (not four-years-done) (not drug-felony)))
+  ; For the premium tax credit's household income (Form 8962, Worksheet 1-2).
+  (input magi : usd :default $0
+    :label "Their modified AGI, if their income requires them to file a return"
+    :cite "IRC §36B(d)(2)(A)(ii)")
   ; A child turns 17 on their 17th birthday (Rev. Rul. 2003-72), so one
   ; born after 2008-12-31 is under 17 at the end of 2025.
   (def ctc-child :label "Qualifies for the child tax credit" :cite "IRC §24(c), (e), (h)(7)"
@@ -208,6 +216,25 @@
     :label "Part you rolled over yourself within 60 days" :cite "IRC §402(c), §408(d)(3)")
   (def taxable-part :label "Taxable part" (excess taxable rolled-over)))
 
+; Health coverage bought through a Marketplace, for the premium tax credit.
+; Every policy is taken to cover the same months, at the same amounts each
+; month.
+(input marketplace : bool :default false
+  :label "You or someone in your tax family had coverage from a Health Insurance Marketplace"
+  :cite "IRC §36B(c)(3)")
+(input marketplace-months : number :default 12 :label "Months of Marketplace coverage")
+(input residence : residence :default 'states-dc :label "State of residence for the federal poverty line")
+; Married filing separately takes the credit only when a victim of domestic
+; abuse or abandoned by the spouse (Form 8962, line A).
+(input ptc-separate-exception : bool :default false
+  :label "Married filing separately, but living apart from a spouse who abused or abandoned you"
+  :cite "Treas. Reg. §1.36B-2(b)(2)")
+(collection f1095-as :label "Forms 1095-A"
+  (input premiums : usd :label "Annual enrollment premiums" :line 33A)
+  (input slcsp : usd :label "Annual applicable SLCSP premium" :line 33B)
+  (input advance : usd :default $0
+    :label "Annual advance payment of premium tax credit" :line 33C))
+
 ; Railroad retirement benefits treated as social security (Form RRB-1099,
 ; boxes 5 and 10) go here too.
 (collection ssa1099s :label "Forms SSA-1099"
@@ -246,6 +273,7 @@
 (module f2441 (include "forms/f2441.lisp"))
 (module f8863 (include "forms/f8863.lisp"))
 (module f8880 (include "forms/f8880.lisp"))
+(module f8962 (include "forms/f8962.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))
