@@ -22,7 +22,7 @@ factlet eval main.lisp --set married=true f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `people` you may claim, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f8615`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`, `f8615-ws1`, `f8615-ws3`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; `f8615-qdcg9` and `f8615-qdcg15`, `f1040-qdcg` again for Form 8615; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f8615`, `f6251`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`, `f8615-ws1`, `f8615-ws3`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; `f8615-qdcg9` and `f8615-qdcg15`, `f1040-qdcg` again for Form 8615; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -120,6 +120,13 @@ factlet eval main.lisp --set married=true f1040/line34
 - Tax from the Tax Table (the midpoint of each $25 or $50 row) below
   $100,000, the Tax Computation Worksheet from $100,000, and the Qualified
   Dividends and Capital Gain Tax Worksheet.
+- Form 6251, the alternative minimum tax, on Schedule 2 line 2: taxable
+  income with the standard deduction (or state and local taxes), the
+  senior deduction, private activity bond interest and incentive stock
+  options added back, less an exemption that comes down by 25% past
+  $626,350 ($1,252,700 joint), taxed at 26% and 28%, with qualified
+  dividends and net capital gain at their own rates (Part III). It's owed
+  to the extent it's more than the regular tax.
 - Form 8615, the kiddie tax: for a child under 18, or 18 or a full-time
   student under 24 whose earned income was no more than half their support,
   with a parent alive and not filing jointly, net unearned income over
@@ -319,6 +326,12 @@ These give wrong answers for returns they affect, so they come first:
   plan deductions. Above the threshold, Form 8995-A (the wage and property
   limits, and the phaseout for a specified service business) isn't
   modeled: its result is asked for instead.
+- The AMT makes only the adjustments above (lines 2a, 2g and 2i): not
+  investment interest, tax refunds, depreciation, net operating losses,
+  passive activities, small business stock or the rest of lines 2b–3. It
+  has no AMT basis for stock sold, no unrecaptured section 1250 gain in
+  Part III, no AMT foreign tax credit, and no credit for prior year
+  minimum tax (Form 8801).
 - The kiddie tax counts all of a business's profit as earned income, not
   just a reasonable allowance where capital matters, and leaves out the
   early withdrawal penalty. It takes no itemized deductions as directly
@@ -339,6 +352,5 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 6251, the alternative minimum tax
-2. Form 8995-A, above the qualified business income threshold
-3. Tax year 2026 (Rev. Proc. 2025-32)
+1. Form 8995-A, above the qualified business income threshold
+2. Tax year 2026 (Rev. Proc. 2025-32)

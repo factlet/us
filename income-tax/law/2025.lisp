@@ -289,6 +289,25 @@
     married-separate                            $125,000
     else                                        $200,000))
 
+; Alternative minimum tax: an exemption that comes down by 25% of AMTI over
+; the start, then 26% of the rest up to the 28% bracket. On a separate
+; return, AMTI is raised once the exemption is gone, as though the other
+; spouse's had been shared.
+(def amt-exemption :cite "IRC §55(d); Rev. Proc. 2024-40"
+  (table filing-status
+    (single head-of-household)                  $88,100
+    (married-joint qualifying-surviving-spouse) $137,000
+    married-separate                            $68,500))
+(def amt-phaseout-start :cite "IRC §55(d); Rev. Proc. 2024-40"
+  (table filing-status
+    (married-joint qualifying-surviving-spouse) $1,252,700
+    else                                        $626,350))
+(def amt-phaseout-rate :cite "IRC §55(d)" 25%)
+(def amt-brackets :cite "IRC §55(b)(1)(A); Rev. Proc. 2024-40"
+  (table filing-status
+    married-separate [26% $119,550 28%]
+    else             [26% $239,100 28%]))
+
 ; On the taxable part of a distribution from an IRA or retirement plan
 ; before age 59½, unless an exception applies.
 (def early-distribution-rate :cite "IRC §72(t)(1)" 10%)

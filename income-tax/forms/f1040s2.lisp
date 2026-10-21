@@ -1,5 +1,6 @@
 ; Schedule 2 (2025), Additional Taxes. So far only the repayment of excess
-; advance premium tax credit, self-employment tax, the Additional Medicare
+; advance premium tax credit, the alternative minimum tax, self-employment
+; tax, the Additional Medicare
 ; Tax, the net investment income tax, and the additional taxes on early
 ; distributions from IRAs and retirement plans and on HSA distributions
 ; not spent on medical care.
@@ -7,7 +8,9 @@
 ; ---- Part I: Tax ----
 
 (def line1a :label "Excess advance premium tax credit repayment" f8962/line29)
-(def line3 :label "Additions to tax" line1a)                   ; + 1b–1z 2
+(def line1z :label "Other additions to tax" line1a)            ; + 1b–1y
+(def line2 :label "Alternative minimum tax" f6251/line11)
+(def line3 :label "Additions to tax" (+ line1z line2))
 
 ; ---- Part II: Other taxes ----
 

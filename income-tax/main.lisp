@@ -333,7 +333,10 @@
   (input treasury-interest : usd :default $0
     :label "Interest on U.S. Savings Bonds and Treasury obligations" :line 3)
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
-  (input tax-exempt-interest : usd :default $0 :label "Tax-exempt interest" :line 8))
+  (input tax-exempt-interest : usd :default $0 :label "Tax-exempt interest" :line 8)
+  ; Taxed by the AMT (Form 6251, line 2g).
+  (input private-activity-interest : usd :default $0
+    :label "Specified private activity bond interest" :line 9 :cite "IRC §57(a)(5)"))
 
 (collection f1099-divs :label "Forms 1099-DIV"
   (input ordinary : usd :label "Total ordinary dividends" :line 1a)
@@ -344,7 +347,9 @@
   ; than 45 days.
   (input section-199a : usd :default $0 :label "Section 199A dividends" :line 5
     :cite "IRC §199A(e)(3); Treas. Reg. §1.199A-3(c)(2)")
-  (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12))
+  (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12)
+  (input private-activity-dividends : usd :default $0
+    :label "Specified private activity bond interest dividends" :line 13 :cite "IRC §57(a)(5)"))
 
 ; Sales of stock and other capital assets, as Forms 1099-B and 1099-DA
 ; report them (in 1099-B's boxes here), or any sale without one: each a row
@@ -403,6 +408,14 @@
   (input slcsp : usd :label "Annual applicable SLCSP premium" :line 33B)
   (input advance : usd :default $0
     :label "Annual advance payment of premium tax credit" :line 33C))
+
+; Stock bought by exercising an incentive stock option and still held at
+; the end of the year: no income for the regular tax, but for the AMT its
+; value when first transferable or vested, less what was paid (Form 3921,
+; box 4 less box 3, times box 5).
+(input iso-adjustment : usd :default $0
+  :label "Incentive stock options exercised: the stock's value less what you paid, for shares not sold in the year"
+  :cite "IRC §56(b)(3)")
 
 ; Railroad retirement benefits treated as social security (Form RRB-1099,
 ; boxes 5 and 10) go here too.
@@ -496,6 +509,7 @@
 (module f8880 (include "forms/f8880.lisp"))
 (module f8962 (include "forms/f8962.lisp"))
 (module f8995 (include "forms/f8995.lisp"))
+(module f6251 (include "forms/f6251.lisp"))
 (module f8615 (include "forms/f8615.lisp"))
 (module f8615-ws1 (include "forms/f8615-ws1.lisp"))
 (module f8615-ws3 (include "forms/f8615-ws3.lisp"))
