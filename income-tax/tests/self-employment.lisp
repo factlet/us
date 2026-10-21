@@ -1,7 +1,7 @@
 ; Self-employment: Schedule SE, and self-employment income as earned income.
 
 (test "self-employment tax is 15.3% of 92.35% of the profit, half of it deducted"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member f1040scs consulting (given receipts $40,000))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line4a $36,940
@@ -20,7 +20,7 @@
           f1040/line37 $7,468.82))
 
 (test "the 12.4% stops where wages and self-employment reach $176,100"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme
     (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
   (member f1040scs consulting (given receipts $40,000))
@@ -31,7 +31,7 @@
           f1040s1/line15 $2,153.83))
 
 (test "under $400 of net earnings, no self-employment tax, nor questions for it"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   ; No social security wages asked.
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1040scs side (given receipts $400))
@@ -41,7 +41,7 @@
           f1040s2/line4 $0))
 
 (test "statutory employee income is income and earned income, but not self-employment"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member f1040scs route (given receipts $30,000 statutory-employee true))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f1040s1/line3 $30,000
@@ -51,7 +51,7 @@
           f1040-eic/line1 $30,000))
 
 (test "each spouse figures their own, against their own wages"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1985-01-01 spouse/birth-date 1987-01-01)
   (member w2s acme
     (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
@@ -65,7 +65,7 @@
           f1040s1/line15 $7,805.65))
 
 (test "self-employment is earned income for the EIC and the additional child tax credit"
-  (given filing-status 'head-of-household you/birth-date 1990-05-01 you/tin 'ssn)
+  (given kept-up-home true you/birth-date 1990-05-01 you/tin 'ssn)
   (member f1040scs consulting (given receipts $40,000))
   (member people kid (given birth-date 2018-01-01 relationship 'child tin 'ssn))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s)
@@ -82,7 +82,7 @@
           f1040/line37 $2,415.82))
 
 (test "self-employment is compensation for the IRA deduction"
-  (given filing-status 'single you/birth-date 1990-05-01 you/ira-contributions $7,000)
+  (given you/birth-date 1990-05-01 you/ira-contributions $7,000)
   (member f1040scs consulting (given receipts $40,000))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f1040s1-ira/line9 $37,174.09              ; less the half deducted

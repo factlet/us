@@ -24,14 +24,16 @@
 (enum hdhp no-hdhp self-only family)
 
 ; How someone you may claim is related to you:
-;   child           son, daughter, stepchild, adopted child, or a foster child
-;                   placed with you by an agency or a court
+;   child           son, daughter, stepchild, or adopted child
+;   foster-child    a child placed with you by an agency or a court
 ;   sibling         brother or sister, half or step
-;   descendant      a descendant of either, such as a grandchild, niece or nephew
-;   parent          father, mother, stepparent, or an ancestor such as a grandparent
-;   other-relative  aunt, uncle, or an in-law
+;   descendant      a descendant of any of them, such as a grandchild, niece
+;                   or nephew
+;   parent          father or mother
+;   other-relative  a grandparent or other ancestor, stepparent, aunt, uncle,
+;                   or in-law
 ;   unrelated       anyone else
-(enum relationship child sibling descendant parent other-relative unrelated)
+(enum relationship child foster-child sibling descendant parent other-relative unrelated)
 
 ; Where you lived, for the federal poverty line: Alaska's and Hawaii's are
 ; higher than the rest of the country's.
@@ -40,8 +42,55 @@
 ; The form's "subtract b from a; if zero or less, enter -0-".
 (defn excess [a : usd b : usd] (max $0 (- a b)))
 
-(input filing-status : filing-status :label "Filing status")
-(def joint (= filing-status 'married-joint))
+; ---- Filing status ----
+
+; Married as of the end of the year, or of a spouse's death during it; a
+; divorce or a decree of separate maintenance ends it.
+(input married : bool :default false
+  :label "Married at the end of the year, or when your spouse died during it"
+  :cite "IRC §7703(a)")
+(input files-separately : bool :default false
+  :label "Married, filing a separate return from your spouse" :cite "IRC §6013(a)")
+(input spouse-apart : bool :default false
+  :label "Your spouse wasn't a member of your household for the last 6 months of the year"
+  :cite "IRC §7703(b)(3)")
+(input kept-up-home : bool :default false
+  :label "You paid more than half the cost of keeping up your home for the year"
+  :cite "IRC §2(c), §7703(b)(2)")
+(input kept-up-parents-home : bool :default false
+  :label "You paid more than half the cost of keeping up your father's or mother's home for the year"
+  :cite "IRC §2(b)(1)(B)")
+(input widowed-recently : bool :default false
+  :label "Your spouse died in either of the two years before this one, you haven't remarried, and you could have filed jointly for the year they died"
+  :cite "IRC §2(a)")
+
+; Married filing separately, but unmarried for the filing status: your
+; spouse away for the last 6 months, from a home you kept up that was for
+; more than half the year your child's, your dependent or released to the
+; other parent.
+(def considered-unmarried :label "Considered unmarried" :cite "IRC §7703(b)"
+  (and married files-separately spouse-apart kept-up-home
+       (any people (and (or (= relationship 'child) (= relationship 'foster-child))
+                        (not lived-apart) (or dependent released)))))
+; Widowed in either of the last two years, keeping up a home that was all
+; year a dependent child's, but not a foster child's.
+(def surviving-spouse :label "A qualifying surviving spouse" :cite "IRC §2(a)"
+  (and (not married) widowed-recently kept-up-home
+       (any people (and (= relationship 'child) dependent household-all-year))))
+; Unmarried, or considered so, keeping up a home that was for more than
+; half the year a qualifying person's, or a dependent parent's home.
+(def head-of-household :label "A head of household" :cite "IRC §2(b)"
+  (and (or (not married) considered-unmarried)
+       (or (and kept-up-home (any people hoh-person))
+           (and kept-up-parents-home (any people (and (= relationship 'parent) dependent))))))
+; Joint or separate is the one choice; the rest follows from the facts.
+(def joint :label "Filing a joint return" (and married (not files-separately)))
+(def filing-status :label "Filing status" :cite "IRC §§1, 2, 6013, 7703"
+  (cond (joint 'married-joint)
+        ((and married (not considered-unmarried)) 'married-separate)
+        (surviving-spouse 'qualifying-surviving-spouse)
+        (head-of-household 'head-of-household)
+        (else 'single)))
 
 ; Each filer's own W-2s and businesses are the ones that match `is-spouse`.
 (module you (def is-spouse false) (include "person.lisp"))
@@ -59,11 +108,6 @@
   :label "Neither of your parents was alive at the end of the year"
   :cite "IRC §25A(i)(5)(B), §1(g)(2)(B)")
 
-; Read only on a separate return, for the child and dependent care credit
-; (Form 2441, line A).
-(input considered-unmarried : bool :default false
-  :label "You lived apart from your spouse the last 6 months of the year, in a home that was the qualifying person's for more than half the year and whose upkeep you paid more than half of"
-  :cite "IRC §21(e)(4)")
 (input spouse-itemizes : bool :default false
   :label "Married filing separately, and your spouse itemizes deductions" :line 12b
   :cite "IRC §63(c)(6)(A)")
@@ -82,9 +126,12 @@
   :cite "IRC §32(c)(1)(A)(ii)(I), (c)(4)")
 (input qualifying-child-of-another : bool :default false
   :label "You could be someone else's qualifying child" :cite "IRC §32(c)(1)(B)")
-(input separated-spouse : bool :default false
-  :label "You lived apart from your spouse for the last 6 months of the year, or were legally separated and apart at its end"
+; A married filer apart from their spouse for the last 6 months, or living
+; apart at the end of the year under a separation agreement.
+(input separation-agreement : bool :default false
+  :label "Separated from your spouse under a written agreement, and living apart at the end of the year"
   :cite "IRC §32(d)(2)")
+(def separated-spouse :cite "IRC §32(d)(2)" (or spouse-apart separation-agreement))
 (input files-f2555 : bool :default false
   :label "You or your spouse are filing Form 2555, Foreign Earned Income" :cite "IRC §32(c)(1)(C)")
 ; Counted from the year of the final determination; any other disallowance
@@ -156,7 +203,8 @@
   ; Everything but the support test, which the EIC goes without.
   (def child-tests :label "Meets the relationship, residency, age and joint return tests"
     :cite "IRC §152(c)(1)(A)–(C), (E)"
-    (and (or (= relationship 'child) (= relationship 'sibling) (= relationship 'descendant))
+    (and (or (= relationship 'child) (= relationship 'foster-child) (= relationship 'sibling)
+             (= relationship 'descendant))
          (not lived-apart) (not joint-return) age-test))
   (def qualifying-child :label "Your qualifying child" :cite "IRC §152(c), (e)"
     (or released-to-you (and child-tests (not own-support) (not released))))
@@ -191,6 +239,15 @@
     (and (or joint (not claimed-as-dependent))
          (or (not nonresident-alien) canada-mexico)
          (or qualifying-child qualifying-relative)))
+
+  ; For head of household: an unmarried qualifying child, even one who
+  ; isn't your dependent, or a dependent relative, who lived with you more
+  ; than half the year. Not a child who is your dependent only by the other
+  ; parent's release, nor someone who is only by living with you all year.
+  (def hoh-person :label "A qualifying person for head of household"
+    :cite "IRC §2(b)(1)(A), (b)(3)(B)"
+    (or (and child-tests (not own-support) (or (not married) dependent))
+        (and dependent (not lived-apart) (not released-to-you) (!= relationship 'unrelated))))
 
   ; For the child and dependent care credit (Form 2441, line 2).
   (input disabled : bool :default false

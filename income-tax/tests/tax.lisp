@@ -2,7 +2,7 @@
 ; Dividends and Capital Gain Tax Worksheet.
 
 (test "the Tax Table taxes the middle of the row"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $58,000 medicare-wages $58,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   ; row $42,250–$42,300: $1,192.50 + 12% × ($42,275 − $11,925)
@@ -11,7 +11,7 @@
 
 ; The tax needs only wages, so withholding can stay unanswered.
 (test "the Tax Table's rows are irregular at the bottom, then $25, then $50"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $15,750 medicare-wages $15,750))  ; exactly the deduction
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (member w2s a (given wages $4 medicare-wages $4))
@@ -27,7 +27,7 @@
           f1040/line34 ?))
 
 (test "from $100,000, the Tax Computation Worksheet is exact"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1980-01-01 spouse/birth-date 1982-01-01)
   (member w2s acme (given wages $131,500 medicare-wages $131,500))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -36,7 +36,7 @@
           f1040/line16 $11,828))
 
 (test "qualified dividends straddling the 0% and 15% rates"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $7,000))
   (member f1099-divs fund (given ordinary $10,000 qualified $10,000))
   (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -53,7 +53,7 @@
           f1040/line34 $1,040))
 
 (test "capital gain distributions are all taxed at 0% below the threshold"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member f1099-divs fund (given ordinary $10,000 qualified $8,000 cap-gain $2,000))
   (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)

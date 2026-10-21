@@ -1,7 +1,7 @@
 ; Credits: Schedule 8812.
 
 (test "joint filers with two young children"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1985-01-01 you/tin 'ssn
          spouse/birth-date 1987-01-01 spouse/tin 'ssn)
   (member w2s acme (given wages $70,000 medicare-wages $70,000 withheld $4,000))
@@ -20,7 +20,7 @@
           f1040/line34 $194))
 
 (test "a child under 17 at year end is born after 2008-12-31"
-  (given filing-status 'single you/birth-date 1990-01-01 you/tin 'ssn)
+  (given you/birth-date 1990-01-01 you/tin 'ssn)
   (member people a
     (given birth-date 2009-01-01 relationship 'child tin 'ssn)
     (expect ctc-child true))
@@ -30,7 +30,7 @@
   (expect f1040s8/line4 1 f1040s8/line6 1 f1040s8/line8 $2,700))
 
 (test "a child without a valid SSN gets the $500 credit if they have a number"
-  (given filing-status 'single you/birth-date 1990-01-01 you/tin 'ssn)
+  (given you/birth-date 1990-01-01 you/tin 'ssn)
   (member people itin (given birth-date 2015-01-01 relationship 'child tin 'itin))
   (member people nonwork (given birth-date 2016-01-01 relationship 'child tin 'nonwork-ssn))
   (member people adopted (given birth-date 2017-01-01 relationship 'child tin 'atin))
@@ -39,7 +39,7 @@
   (expect f1040s8/line4 0 f1040s8/line6 3 f1040s8/line8 $1,500))
 
 (test "a filer without a valid SSN gets $500 per child instead of $2,200"
-  (given filing-status 'head-of-household you/birth-date 1990-01-01)
+  (given kept-up-home true you/birth-date 1990-01-01)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $3,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member people kid (given birth-date 2020-01-01 relationship 'child tin 'ssn))
@@ -56,14 +56,14 @@
           f1040/line34 $1,862))
 
 (test "on a joint return, one spouse's SSN is enough"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1990-01-01 you/tin 'itin
          spouse/birth-date 1990-01-01 spouse/tin 'ssn)
   (member people kid (given birth-date 2020-01-01 relationship 'child tin 'ssn))
   (expect f1040s8/line4 1 f1040s8/line5 $2,200 f1040s8/line8 $2,200))
 
 (test "no credit for dependents if a filer's number came after the due date"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1990-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'no-tin)
   (member people kid (given birth-date 2020-01-01 relationship 'child tin 'ssn))
@@ -73,7 +73,7 @@
 
 (test "a dependent who isn't a U.S. citizen, national or resident alien gets no credit"
   ; The instructions' example: a sibling's 10-year-old who lives in Mexico.
-  (given filing-status 'single you/birth-date 1990-01-01 you/tin 'ssn)
+  (given you/birth-date 1990-01-01 you/tin 'ssn)
   (member people niece
     (given birth-date 2015-01-01 relationship 'descendant lived-apart true tin 'itin
            nonresident-alien true)
@@ -88,7 +88,7 @@
   (expect f1040s8/line4 0 f1040s8/line6 1 f1040s8/line8 $500))
 
 (test "the credit phases out by $50 per $1,000 or part of it"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1980-01-01 you/tin 'ssn
          spouse/birth-date 1980-01-01 spouse/tin 'ssn)
   (member w2s acme (given wages $410,500 medicare-wages $410,500 withheld $80,000))
@@ -106,7 +106,7 @@
           f1040/line24 $75,948.50))
 
 (test "the additional child tax credit refunds what the tax can't absorb"
-  (given filing-status 'head-of-household you/birth-date 1995-01-01 you/tin 'ssn)
+  (given kept-up-home true you/birth-date 1995-01-01 you/tin 'ssn)
   (member w2s acme (given wages $25,000 medicare-wages $25,000 withheld $500))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member people kid (given birth-date 2022-05-01 relationship 'child tin 'ssn))
@@ -123,7 +123,7 @@
           f1040/line34 $6,260))                      ; $500 + $4,060 + $1,700
 
 (test "the additional child tax credit is 15% of earned income over $2,500"
-  (given filing-status 'single you/birth-date 1995-01-01 you/tin 'ssn)
+  (given you/birth-date 1995-01-01 you/tin 'ssn)
   (member w2s acme (given wages $10,000 medicare-wages $10,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member people kid (given birth-date 2022-05-01 relationship 'child tin 'ssn))
@@ -135,7 +135,7 @@
           f1040/line34 $4,534))                      ; $1,125 + $3,409
 
 (test "with three children, Part II-B refunds payroll taxes the EIC doesn't"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1990-01-01 you/tin 'ssn
          spouse/birth-date 1990-01-01 spouse/tin 'itin)
   (member w2s acme

@@ -1,7 +1,7 @@
 ; Tips, overtime and car loan interest: Schedule 1-A, Parts II–IV.
 
 (test "tips as an employee are deducted, for a filer with a valid SSN"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s cafe
     (given wages $40,000 medicare-wages $40,000 withheld $0 qualified-tips $8,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -17,7 +17,7 @@
           f1040/line16 $1,715))
 
 (test "both spouses' tips share $25,000, less $100 for each full $1,000 over $300,000"
-  (given filing-status 'married-joint you/tin 'ssn spouse/tin 'ssn)
+  (given married true you/tin 'ssn spouse/tin 'ssn)
   (member w2s yours
     (given wages $200,000 medicare-wages $200,000 withheld $0 qualified-tips $20,000))
   (member w2s theirs
@@ -36,7 +36,7 @@
           f1040s1a/line13 $8,800))
 
 (test "overtime premium up to $12,500, or $25,000 on a joint return"
-  (given filing-status 'single you/tin 'ssn)
+  (given you/tin 'ssn)
   (member w2s plant
     (given wages $160,500 medicare-wages $160,500 withheld $0 qualified-overtime $14,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -45,12 +45,12 @@
           f1040s1a/line18 $10,500
           f1040s1a/line20 $1,000                     ; 10 × $100
           f1040s1a/line21 $11,500)
-  (given filing-status 'married-joint)
+  (given married true)
   (expect f1040s1a/line15 $14,000
           f1040s1a/line21 $14,000))
 
 (test "married filing separately: no tips or overtime, but car loan interest"
-  (given filing-status 'married-separate vehicle-loan true)
+  (given married true files-separately true vehicle-loan true)
   (member w2s cafe
     (given wages $50,000 medicare-wages $50,000 withheld $0
            qualified-tips $5,000 qualified-overtime $2,000))
@@ -63,7 +63,6 @@
           f1040s1a/line38 $3,000))
 
 (test "car loan interest up to $10,000, less $200 for each $1,000 or part over $100,000"
-  (given filing-status 'single)
   (member w2s acme (given wages $105,500 medicare-wages $105,500 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line23 $0)                        ; no loans asked about
@@ -77,11 +76,11 @@
           f1040s1a/line28 6
           f1040s1a/line29 $1,200
           f1040s1a/line30 $8,800)
-  (given filing-status 'married-joint)
+  (given married true)
   (expect f1040s1a/line30 $10,000))
 
 (test "a business's tips count only up to its profit, and none from a loss"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   ; $400 of profit, so $369.40 of net earnings: no self-employment tax
   (member f1040scs rideshare (given receipts $5,000 car $4,600 qualified-tips $1,800))
   (member f1040scs tutoring (given receipts $1,000 supplies $1,500 qualified-tips $300))
@@ -91,7 +90,7 @@
           f1040s1a/line13 $400))
 
 (test "and less its share of its owner's deductible self-employment tax"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   (member f1040scs consulting (given receipts $40,000))
   (member f1040scs tours (given receipts $50,000 other-expenses $10,000 qualified-tips $38,000))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)

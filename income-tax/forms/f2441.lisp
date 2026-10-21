@@ -1,8 +1,12 @@
 ; Form 2441 (2025), Child and Dependent Care Expenses. IRC §§21, 129.
 
 ; Married filing separately takes the credit only when considered
-; unmarried for it (line A).
-(def eligible (or (!= filing-status 'married-separate) considered-unmarried))
+; unmarried for it (line A): the spouse away for the last 6 months, from a
+; home you kept up that was for more than half the year a qualifying
+; person's.
+(def living-apart :label "Considered unmarried for the credit" :cite "IRC §21(e)(4)"
+  (and spouse-apart kept-up-home (any people (and care-person (not lived-apart)))))
+(def eligible (or (!= filing-status 'married-separate) living-apart))
 (def persons :label "Qualifying persons" (count people care-person))
 (def two-or-more (>= persons 2))
 (def deemed-income (nth law/care-deemed-income (if two-or-more 1 0)))
@@ -41,7 +45,7 @@
 (def line19 :label "Your spouse's earned income" (if joint spouse/earned-income line18))
 (def line20 (max $0 (min line17 line18 line19)))
 (def line21 :label "Exclusion limit" :cite "IRC §129(a)(2)"
-  (if (and (= filing-status 'married-separate) (not considered-unmarried))
+  (if (and (= filing-status 'married-separate) (not living-apart))
       law/care-benefits-limit-separate
       law/care-benefits-limit))
 (def line23 line15)                                              ; − 22

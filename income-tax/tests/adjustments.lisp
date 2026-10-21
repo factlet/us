@@ -1,7 +1,7 @@
 ; Adjustments to income: Schedule 1 Part II.
 
 (test "student loan interest is deducted up to $2,500"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $6,000))
   (member f1098-es lender (given interest $3,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs ssa1099s f1040scs people)
@@ -15,7 +15,7 @@
           f1040/line34 $1,225))
 
 (test "it phases out over $15,000 of modified AGI from $85,000"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $90,000 medicare-wages $90,000 withheld $0))
   (member f1098-es lender (given interest $2,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs ssa1099s f1040scs people)
@@ -28,7 +28,7 @@
   (expect f1040s1-sli/line7 1 f1040/line10 $0))
 
 (test "on a joint return it phases out over $30,000 from $170,000"
-  (given filing-status 'married-joint)
+  (given married true)
   (member w2s acme (given wages $180,000 medicare-wages $180,000 withheld $0))
   (member f1098-es lender (given interest $2,500))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs ssa1099s f1040scs people)
@@ -37,24 +37,23 @@
           f1040/line10 $1,667.50))
 
 (test "no deduction on a separate return, or for someone another can claim"
-  (given filing-status 'married-separate)
+  (given married true files-separately true)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1098-es lender (given interest $1,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs ssa1099s f1040scs people)
   (expect f1040/line10 $0)
-  (given filing-status 'single claimed-as-dependent true)
+  (given married false claimed-as-dependent true)
   (expect f1040/line10 $0)
   (given claimed-as-dependent false)
   (expect f1040/line10 $1,000))
 
 (test "with no IRA contribution, the IRA deduction asks nothing"
-  (given filing-status 'single)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1/line20 $0))
 
 (test "not covered by a plan at work: up to $7,000, or $8,000 from 50"
-  (given filing-status 'single you/ira-contributions $8,500)
+  (given you/ira-contributions $8,500)
   (member w2s acme (given wages $200,000 medicare-wages $200,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (given you/birth-date 1990-05-01)
@@ -64,7 +63,7 @@
           f1040/line11a $192,000))
 
 (test "covered by a plan at work, single: phased out from $79,000 to $89,000"
-  (given filing-status 'single you/birth-date 1990-05-01
+  (given you/birth-date 1990-05-01
          you/retirement-plan true you/ira-contributions $7,000)
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (member w2s acme (given wages $79,000 medicare-wages $79,000 withheld $0))
@@ -80,7 +79,7 @@
   (expect f1040s1/line20 $0))
 
 (test "on a joint return, a spouse not covered phases out from $236,000 to $246,000"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1980-01-01 you/retirement-plan true you/ira-contributions $7,000
          spouse/birth-date 1985-01-01 spouse/ira-contributions $7,000)
   (member w2s acme (given wages $240,000 medicare-wages $240,000 withheld $0))
@@ -90,7 +89,7 @@
           f1040s1/line20 $4,200))
 
 (test "married filing separately, covered through a spouse you lived with"
-  (given filing-status 'married-separate you/birth-date 1990-05-01
+  (given married true files-separately true you/birth-date 1990-05-01
          you/ira-contributions $7,000 spouse/retirement-plan true)
   (member w2s acme (given wages $6,000 medicare-wages $6,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -101,7 +100,7 @@
           f1040s1/line20 $6,000))                    ; all of the earned income
 
 (test "a joint return's two IRAs can't take more than the couple's earned income"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1990-05-01 you/ira-contributions $7,000
          spouse/birth-date 1990-05-01 spouse/ira-contributions $7,000)
   (member w2s acme (given wages $10,000 medicare-wages $10,000 withheld $0))

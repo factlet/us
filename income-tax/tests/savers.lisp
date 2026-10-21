@@ -1,7 +1,7 @@
 ; The saver's credit: Form 8880.
 
 (test "50% of up to $2,000 of IRA contributions and deferrals, up to the tax"
-  (given filing-status 'single you/birth-date 1990-05-01 you/roth-contributions $1,000)
+  (given you/birth-date 1990-05-01 you/roth-contributions $1,000)
   (member w2s acme (given wages $22,000 medicare-wages $22,000 withheld $0 deferrals $1,500))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8880/line3a $2,500
@@ -13,7 +13,7 @@
           f1040s3/line4 $628))
 
 (test "20%, then 10%, then none as AGI passes each top"
-  (given filing-status 'single you/birth-date 1990-05-01 you/ira-contributions $2,000)
+  (given you/birth-date 1990-05-01 you/ira-contributions $2,000)
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   ; Deducted, the contributions lower AGI by $2,000.
   (member w2s acme (given wages $27,000 medicare-wages $27,000 withheld $0))
@@ -24,7 +24,7 @@
   (expect f8880/line9 0% f8880/line12 $0))
 
 (test "on a joint return each spouse's own, less both spouses' distributions"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1985-01-01 you/tin 'ssn you/retirement-distributions $500
          spouse/birth-date 1985-01-01 spouse/tin 'ssn)
   (member w2s yours (given wages $30,000 medicare-wages $30,000 withheld $0 deferrals $3,000))
@@ -41,7 +41,7 @@
           f1040s8/line13 $1,353))
 
 (test "not for a full-time student, someone claimed as a dependent, or anyone under 18"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0 deferrals $2,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8880/line6a $2,000)

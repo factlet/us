@@ -1,7 +1,7 @@
 ; The qualified business income deduction: Form 8995.
 
 (test "20% of each business's profit, less its share of self-employment tax"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $0 ss-wages $60,000))
   (member f1040scs consulting (given receipts $40,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
@@ -16,7 +16,7 @@
           f1040/line16 $11,189))
 
 (test "no more than 20% of taxable income less net capital gain and qualified dividends"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member f1040scs consulting (given receipts $40,000))
   (member f1099-divs fund (given ordinary $10,000 qualified $10,000))
   (empty w2s f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
@@ -27,7 +27,7 @@
           f8995/line15 $4,284.818))
 
 (test "qualified REIT dividends add 20% of their own, and a business loss carries forward"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (member f1040scs shop (given receipts $5,000 other-expenses $8,000))
   (member f1099-divs reit (given ordinary $1,000 section-199a $1,000))
@@ -39,7 +39,7 @@
           f8995/line16 -$3,000))
 
 (test "last year's qualified business loss offsets this year's income"
-  (given filing-status 'single you/birth-date 1990-05-01 qbi-loss-carryforward $7,174.09)
+  (given you/birth-date 1990-05-01 qbi-loss-carryforward $7,174.09)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $0 ss-wages $60,000))
   (member f1040scs consulting (given receipts $40,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
@@ -48,7 +48,7 @@
           f8995/line16 $0))
 
 (test "a business's tips deducted on Schedule 1-A aren't qualified business income"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   (member w2s cafe
     (given wages $60,000 medicare-wages $60,000 withheld $0 ss-wages $60,000
            qualified-tips $30,000))
@@ -62,7 +62,7 @@
           f8995/line15 $5,434.818))
 
 (test "above the threshold, Form 8995-A's result is asked for"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s a (given wages $210,000 medicare-wages $210,000 withheld $0))
   (member f1099-divs reit (given ordinary $3,050 section-199a $3,050))
   (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)

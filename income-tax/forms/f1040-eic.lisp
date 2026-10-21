@@ -50,7 +50,7 @@
        (not eic-barred)
        (<= investment-income law/eic-investment-limit)
        (or joint (not qualifying-child-of-another))
-       (or (!= filing-status 'married-separate) (and has-qualifying-child separated-spouse))
+       (or (not married) joint (and has-qualifying-child separated-spouse))
        (or has-qualifying-child without-child)))
 
 ; ---- Worksheet A ----

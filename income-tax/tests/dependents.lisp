@@ -3,7 +3,7 @@
 ; children who aren't dependents.
 
 (test "a qualifying child is under 19, or a student under 24, and younger than you"
-  (given filing-status 'single you/birth-date 2004-01-01)
+  (given you/birth-date 2004-01-01)
   (member people teen (given birth-date 2007-01-01 relationship 'child tin 'ssn)
     (expect age-test true qualifying-child true))
   ; 19 on 2025-12-31
@@ -20,7 +20,7 @@
     (expect age-test true qualifying-child true)))
 
 (test "not one who supports themselves or files jointly, though the EIC takes the first"
-  (given filing-status 'single you/birth-date 1970-01-01 you/tin 'ssn)
+  (given you/birth-date 1970-01-01 you/tin 'ssn)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member people a
@@ -39,10 +39,10 @@
   (expect f1040-eic/children 1))
 
 (test "a qualifying relative has gross income under $5,200, and over half their support from you"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   ; Not a qualifying child, so asked about income and support.
   (member people grandma
-    (given birth-date 1940-01-01 relationship 'parent tin 'ssn lived-apart true)
+    (given birth-date 1940-01-01 relationship 'other-relative tin 'ssn lived-apart true)
     (expect qualifying-child false dependent ?))
   (member people mom
     (given birth-date 1955-01-01 relationship 'parent tin 'ssn lived-apart true
@@ -66,15 +66,15 @@
     (expect dependent true)))
 
 (test "nobody is your dependent if someone can claim you, unless you file jointly"
-  (given filing-status 'single you/birth-date 2003-01-01 you/tin 'ssn claimed-as-dependent true)
+  (given you/birth-date 2003-01-01 you/tin 'ssn claimed-as-dependent true)
   (member people kid (given birth-date 2024-01-01 relationship 'child tin 'ssn)
     (expect qualifying-child true dependent false))
   (expect f1040s8/line4 0)
-  (given filing-status 'married-joint spouse/birth-date 2003-01-01 spouse/tin 'ssn)
+  (given married true spouse/birth-date 2003-01-01 spouse/tin 'ssn)
   (expect f1040s8/line4 1))
 
 (test "the custodial parent who released the claim keeps the EIC and the care credit"
-  (given filing-status 'head-of-household you/birth-date 1990-05-01 you/tin 'ssn)
+  (given kept-up-home true you/birth-date 1990-05-01 you/tin 'ssn)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member people kid
     (given birth-date 2017-01-01 relationship 'child tin 'ssn released true care-expenses $2,000)
@@ -90,7 +90,7 @@
           f2441/line11 $440))
 
 (test "the noncustodial parent gets the child tax credit, but not the EIC or the care credit"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member people kid
     (given birth-date 2017-01-01 relationship 'child lived-apart true tin 'ssn released-to-you true
@@ -107,7 +107,7 @@
           f2441/line11 $0))
 
 (test "a child who provided over half their own support counts for the EIC only"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member people brother
     (given birth-date 2008-06-01 relationship 'sibling own-support true tin 'ssn disabled true
@@ -119,7 +119,7 @@
           f2441/persons 0))
 
 (test "an EIC child counts only living in the United States, with an SSN"
-  (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
+  (given you/birth-date 1990-05-01 you/tin 'ssn)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (member people a

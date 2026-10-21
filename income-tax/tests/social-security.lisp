@@ -1,7 +1,7 @@
 ; Social security benefits: the Social Security Benefits Worksheet.
 
 (test "none are taxable until half of them plus other income passes $25,000"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $24,000))
   (member f1099-ints bank (given interest $10,000))
   (empty w2s f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
@@ -17,7 +17,7 @@
           f1040/line15 $0))                          ; $17,750 + $6,000 for a senior
 
 (test "85% of what's over $34,000, but no more than 85% of the benefits"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $30,000 withheld $3,000))
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $2,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
@@ -35,7 +35,7 @@
           f1040/line37 $1,305))
 
 (test "on a joint return, from $32,000 and $44,000"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1955-06-01 you/tin 'ssn
          spouse/birth-date 1957-02-01 spouse/tin 'ssn)
   (member ssa1099s you (given net-benefits $18,000))
@@ -50,7 +50,7 @@
           f1040/line11a $36,850))
 
 (test "married filing separately, living together, 85% from the first dollar"
-  (given filing-status 'married-separate you/birth-date 1990-01-01)
+  (given married true files-separately true you/birth-date 1990-01-01)
   (member ssa1099s you (given net-benefits $10,000))
   (member f1099-ints bank (given interest $2,000))
   (empty w2s f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
@@ -61,7 +61,7 @@
           f1040/line6b $0))
 
 (test "tax-exempt interest counts toward the base amount, though it isn't taxed"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $20,000))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $16,000))
   (empty w2s f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
@@ -70,7 +70,7 @@
           f1040/line11a $500))
 
 (test "repayments over the year's benefits leave none taxable"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits -$500))
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
@@ -82,7 +82,7 @@
   ; Pub. 590-A, Appendix B: Worksheet 1 figures the benefits taxable
   ; without the deduction, Worksheet 2 the deduction, and Worksheet 3 the
   ; benefits taxable after it.
-  (given filing-status 'single you/birth-date 1962-03-01 you/tin 'ssn
+  (given you/birth-date 1962-03-01 you/tin 'ssn
          you/retirement-plan true you/ira-contributions $8,000)
   (member w2s acme (given wages $48,000 medicare-wages $48,000 withheld $0))
   (member ssa1099s you (given net-benefits $46,000))

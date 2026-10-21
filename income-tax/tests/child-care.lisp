@@ -2,7 +2,7 @@
 ; and the child tax credit's Credit Limit Worksheet A after it.
 
 (test "20% of up to $3,000 for one child, and the child tax credit takes what tax is left"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1985-01-01 you/tin 'ssn spouse/birth-date 1987-01-01 spouse/tin 'ssn)
   (member w2s yours (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member w2s theirs (given wages $20,000 medicare-wages $20,000 withheld $0 spouses true))
@@ -20,7 +20,7 @@
           f1040/line22 $0))
 
 (test "35% less 1% for each $2,000 over $15,000; two children, up to $6,000"
-  (given filing-status 'head-of-household you/birth-date 1990-01-01 you/tin 'ssn)
+  (given kept-up-home true you/birth-date 1990-01-01 you/tin 'ssn)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member people a
     (given birth-date 2019-01-01 relationship 'child tin 'ssn care-expenses $3,500))
@@ -37,7 +37,7 @@
           f1040s8/line27 $3,400))
 
 (test "no more than the lower earner's earned income; a student spouse counts $250 a month"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1985-01-01 spouse/birth-date 1987-01-01 spouse/care-deemed-months 9)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member people kid
@@ -48,7 +48,7 @@
           f2441/line11 $495))                        ; 22% × $2,250
 
 (test "employer dependent care benefits are excluded up to $5,000, and use up the expense limit"
-  (given filing-status 'head-of-household you/birth-date 1990-01-01)
+  (given kept-up-home true you/birth-date 1990-01-01)
   (member w2s acme
     (given wages $50,000 medicare-wages $50,000 withheld $0 dependent-care $5,000))
   (member people a
@@ -63,7 +63,7 @@
           f2441/line11 $200))
 
 (test "benefits past the expenses are taxable wages"
-  (given filing-status 'single you/birth-date 1990-01-01)
+  (given you/birth-date 1990-01-01)
   (member w2s acme
     (given wages $40,000 medicare-wages $40,000 withheld $0 dependent-care $5,000))
   (member people kid
@@ -75,17 +75,32 @@
           f2441/line11 $0))
 
 (test "married filing separately takes it only when considered unmarried"
-  (given filing-status 'married-separate you/birth-date 1990-01-01)
+  (given married true files-separately true you/birth-date 1990-01-01)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member people kid
     (given birth-date 2020-01-01 relationship 'child tin 'ssn care-expenses $2,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line11 $0)
-  (given considered-unmarried true)
-  (expect f2441/line11 $440))                        ; 22% × $2,000
+  ; Apart from your spouse the last 6 months, in a home you kept up for your
+  ; child, you're unmarried for the filing status too.
+  (given spouse-apart true kept-up-home true)
+  (expect filing-status 'head-of-household
+          f2441/line11 $440))                        ; 22% × $2,000
+
+(test "or, for someone other than a child, considered unmarried only for the credit"
+  (given married true files-separately true spouse-apart true kept-up-home true
+         you/birth-date 1990-01-01 you/tin 'ssn)
+  (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
+  (member people mom
+    (given birth-date 1950-01-01 relationship 'parent tin 'ssn gross-income $0 supported true
+           disabled true care-expenses $2,000))
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
+  (expect filing-status 'married-separate
+          f2441/living-apart true
+          f2441/line11 $440))
 
 (test "a child counts only before turning 13, unless disabled"
-  (given filing-status 'single you/birth-date 1990-01-01)
+  (given you/birth-date 1990-01-01)
   (member people a (given birth-date 2012-01-01 relationship 'child tin 'ssn)
     (expect care-person false))                      ; 13 all year
   (member people b (given birth-date 2012-01-02 relationship 'child tin 'ssn)

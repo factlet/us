@@ -1,7 +1,7 @@
 ; Retirement income: IRA distributions, pensions and annuities (Form 1099-R).
 
 (test "a pension and an IRA distribution, each on its own line"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member f1099-rs pension (given gross $30,000 taxable $28,000 withheld $3,000))
   (member f1099-rs ira (given gross $10,000 taxable $10,000 withheld $1,000 ira true))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
@@ -17,7 +17,7 @@
           f1040/line34 $2,525))
 
 (test "what you roll over within 60 days isn't taxed"
-  (given filing-status 'single you/birth-date 1980-01-01)
+  (given you/birth-date 1980-01-01)
   (member f1099-rs all (given gross $20,000 taxable $20,000 ira true rolled-over $20,000))
   (member f1099-rs part (given gross $5,000 taxable $5,000 ira true rolled-over $3,000))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
@@ -26,7 +26,7 @@
           f1040/line9 $2,000))
 
 (test "an early distribution owes 10% more, unless it was rolled over"
-  (given filing-status 'single you/birth-date 1990-05-01)
+  (given you/birth-date 1990-05-01)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $5,000))
   (member f1099-rs plan (given gross $10,000 taxable $10,000 withheld $2,000 early true))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
@@ -44,7 +44,7 @@
           f1040s2/line8 $1,000))
 
 (test "pensions count toward the social security base amount"
-  (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
+  (given you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $20,000))
   (member f1099-rs pension (given gross $25,000 taxable $25,000))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es f1040scs people)

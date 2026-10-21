@@ -1,12 +1,12 @@
 ; HSAs: Form 8889.
 
 (test "without HDHP coverage, the HSA deduction asks nothing"
-  (given filing-status 'single you/hsa-contributions $1,000)
+  (given you/hsa-contributions $1,000)
   (expect you/f8889/line3 $0
           f1040s1/line13 $0))
 
 (test "self-only coverage: up to $4,300, less what the employer put in"
-  (given filing-status 'single you/birth-date 1990-05-01
+  (given you/birth-date 1990-05-01
          you/hdhp 'self-only you/hsa-contributions $3,000 you/hsa-employer $2,000)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -18,13 +18,13 @@
   (expect f1040s1/line13 $1,000))
 
 (test "family coverage, and $1,000 more from age 55"
-  (given filing-status 'head-of-household you/birth-date 1968-04-01
+  (given you/birth-date 1968-04-01
          you/hdhp 'family you/hsa-contributions $10,000)
   (expect you/f8889/line3 $9,550                     ; $8,550 + $1,000
           f1040s1/line13 $9,550))
 
 (test "eligible for part of the year: the limit for each month"
-  (given filing-status 'single you/birth-date 1990-05-01
+  (given you/birth-date 1990-05-01
          you/hdhp 'self-only you/hsa-months 6 you/hsa-contributions $4,300)
   (expect you/f8889/line3 $2,150                     ; 6/12 × $4,300
           f1040s1/line13 $2,150)
@@ -33,7 +33,7 @@
   (expect f1040s1/line13 $4,300))
 
 (test "spouses with family coverage share its limit, but not the $1,000 from 55"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1968-04-01 you/hdhp 'family you/hsa-contributions $5,000
          spouse/birth-date 1985-01-01 spouse/hdhp 'self-only spouse/hsa-contributions $4,000)
   ; The spouse's self-only plan counts as family coverage too.
@@ -49,13 +49,13 @@
           f1040s1/line13 $9,550))
 
 (test "married filing separately with family coverage takes half its limit"
-  (given filing-status 'married-separate you/birth-date 1990-05-01
+  (given married true files-separately true you/birth-date 1990-05-01
          you/hdhp 'family you/hsa-contributions $8,000)
   (expect you/f8889/line6 $4,275
           f1040s1/line13 $4,275))
 
 (test "distributions not spent on medical care are taxable, and 20% more"
-  (given filing-status 'single you/birth-date 1990-05-01
+  (given you/birth-date 1990-05-01
          you/hsa-distributions $3,000 you/hsa-medical $2,000)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $4,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -73,7 +73,7 @@
   (expect f1040s1/line8f $500))
 
 (test "the HSA deduction lowers the income the IRA phaseout looks at"
-  (given filing-status 'single you/birth-date 1990-05-01
+  (given you/birth-date 1990-05-01
          you/retirement-plan true you/ira-contributions $7,000
          you/hdhp 'self-only you/hsa-contributions $4,300)
   (member w2s acme (given wages $85,000 medicare-wages $85,000 withheld $0))

@@ -1,7 +1,7 @@
 ; Deductions: the standard deduction and Schedule 1-A.
 
 (test "joint seniors, one blind, in the senior deduction's phaseout"
-  (given filing-status 'married-joint
+  (given married true
          you/birth-date 1955-03-01 you/blind true you/tin 'ssn
          spouse/birth-date 1958-07-04 spouse/tin 'ssn)
   (member w2s acme (given wages $160,000 medicare-wages $160,000 withheld $20,000))
@@ -19,7 +19,7 @@
           f1040/line34 $2,870))
 
 (test "turning 65: born on 1961-01-01 counts for 2025, a day later doesn't"
-  (given filing-status 'single you/tin 'ssn)
+  (given you/tin 'ssn)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (given you/birth-date 1961-01-01)
@@ -32,7 +32,7 @@
           f1040s1a/line37 $0))
 
 (test "the senior deduction asks for an SSN only of seniors"
-  (given filing-status 'single you/birth-date 1950-01-01)
+  (given you/birth-date 1950-01-01)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line37 ? f1040/line37 ?)
@@ -40,14 +40,14 @@
   (expect f1040s1a/line37 $0 f1040/line12e $17,750))
 
 (test "married filing separately gets no senior deduction"
-  (given filing-status 'married-separate you/birth-date 1950-01-01 you/tin 'ssn)
+  (given married true files-separately true you/birth-date 1950-01-01 you/tin 'ssn)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040/line12e $17,350                      ; $15,750 + $1,600
           f1040s1a/line37 $0))
 
 (test "a dependent's standard deduction is earned income plus $450"
-  (given filing-status 'single you/birth-date 2000-09-01 claimed-as-dependent true)
+  (given you/birth-date 2000-09-01 claimed-as-dependent true)
   (member w2s cafe (given wages $14,000 medicare-wages $14,000 withheld $100))
   (member f1099-ints bank (given interest $5,000))
   (empty f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
@@ -57,7 +57,7 @@
           f1040/line37 $358))
 
 (test "a dependent's standard deduction is at least $1,350"
-  (given filing-status 'single you/birth-date 2000-09-01 claimed-as-dependent true)
+  (given you/birth-date 2000-09-01 claimed-as-dependent true)
   (empty w2s f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (member f1099-ints bank (given interest $3,000))
   (expect f1040/line12e $1,350

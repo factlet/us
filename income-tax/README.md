@@ -12,7 +12,7 @@ From this directory, with the `factlet` command
 
 ```sh
 factlet explain main.lisp --case examples/family.lisp f1040/line34
-factlet eval main.lisp --set "filing-status='single" f1040/line34
+factlet eval main.lisp --set married=true f1040/line34
 ```
 
 ## Layout
@@ -182,6 +182,26 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   reckless, and, for filers without a qualifying child, the age, home and
   dependent rules. After any other disallowance, it assumes Form 8862 is
   attached to claim it again.
+- Filing status (IRC §2, §7703), from the facts of the year rather than
+  asked. Married at the end of the year files jointly, or separately by
+  choice. Otherwise:
+  - qualifying surviving spouse: a spouse who died in either of the two
+    years before, and a home kept up all year for a dependent child (not
+    a foster child)
+  - head of household: a home kept up for over half the year for a
+    qualifying person, or a dependent parent's own home. That's an
+    unmarried qualifying child, even one who isn't your dependent, or a
+    dependent relative who lived with you, but not someone who is your
+    dependent only by the other parent's release or by living with you all
+    year.
+  - single, otherwise
+
+  Married filing separately counts as unmarried, and so can be head of
+  household, when your spouse wasn't in your home for the last 6 months
+  and you kept it up for your child (IRC §7703(b)). The child and
+  dependent care credit takes the same for any qualifying person (IRC
+  §21(e)(4)). The EIC's rule for separated spouses applies to every
+  married filer not filing jointly, head of household included.
 - Dependents (IRC §152), from facts about each of the `people` you may
   claim, by Steps 1–5 of the instructions:
   - a qualifying child: a child, sibling or descendant of either who
@@ -289,15 +309,16 @@ These give wrong answers for returns they affect, so they come first:
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
-- The EIC doesn't ask about a married head of household without a
-  qualifying child, which rules it out.
+- Filing status doesn't treat someone married to a nonresident alien as
+  unmarried for head of household (IRC §2(b)(2)(B)), or bar a
+  nonresident alien from it. A surviving spouse's child must be a
+  dependent outright, without the exceptions for their income, a joint
+  return, or your being someone else's dependent (IRC §2(a)(1)(B)).
 
 ## Next
 
 One commit each, in rough order of how many returns need them:
 
-1. Deriving filing status (IRC §2, §7703) from facts, instead of asking
-   for it
-2. Form 8615 (kiddie tax) and Form 6251 (AMT)
-3. Form 8995-A, above the qualified business income threshold
-4. Tax year 2026 (Rev. Proc. 2025-32)
+1. Form 8615 (kiddie tax) and Form 6251 (AMT)
+2. Form 8995-A, above the qualified business income threshold
+3. Tax year 2026 (Rev. Proc. 2025-32)
