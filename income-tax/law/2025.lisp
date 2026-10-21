@@ -150,6 +150,13 @@
 (def car-loan-phaseout-reduction :cite "IRC §163(h)(4)(C)(ii)(I)" $200)
 (def phaseout-step :cite "IRC §§224(b)(2)(A), 225(b)(2)(A), 163(h)(4)(C)(ii)(I)" $1,000)
 
+; Qualified business income: 20% of it and of qualified REIT dividends, no
+; more than 20% of taxable income over net capital gain. Up to the
+; threshold, without Form 8995-A's limits by wages and property.
+(def qbi-rate :cite "IRC §199A(a), (b)(1)" 20%)
+(def qbi-threshold :cite "IRC §199A(e)(2); Rev. Proc. 2024-40"
+  (table filing-status married-joint $394,600 else $197,300))
+
 ; ---- Credits ----
 
 ; Child and dependent care: a share of up to $3,000 of expenses for one

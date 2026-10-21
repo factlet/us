@@ -16,16 +16,14 @@
                qualified-tips $0)))
 ; A business's only up to its net income: its profit less the deductions
 ; allocable to it, here its share of its owner's deductible self-employment
-; tax (Multiple Trades or Businesses Worksheet).
-(def line5 :label "Qualified tips received in a trade or business" :cite "IRC §224(c), (e)"
-  (sum f1040scs
-    (if (and (> qualified-tips $0) (if spouses spouse/valid-ssn you/valid-ssn))
-        (min qualified-tips
-             (excess line31 (if statutory-employee $0
-                                (* line31 (if spouses spouse/se-deduction-rate
-                                              you/se-deduction-rate)))))
-        $0)))
+; tax.
+(def line5 :label "Qualified tips received in a trade or business" :cite "IRC §224(c)"
+  (sum f1040scs tips-counted))
 (def line6 (+ line4c line5))
+; The share of the tips counted that's deducted, after the limit and the
+; phaseout: a business's deducted tips aren't qualified business income.
+(def tips-deducted-rate :cite "IRC §199A(c)(4)(D)"
+  (if (= line6 $0) 0 (/ line13 line6)))
 (def line7 (min line6 law/tips-limit))
 (def line8 line3)
 (def line9 law/tips-phaseout-start)

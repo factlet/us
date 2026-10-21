@@ -22,7 +22,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -130,6 +130,12 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
   over $150,000 ($300,000 joint), and need a valid SSN for whoever received
   them and, if married, a joint return. Car loan interest comes down by
   $200 for each $1,000 or part of it over $100,000 ($200,000 joint).
+- Form 8995: the qualified business income deduction (line 13a), 20% of
+  each Schedule C's profit, less its share of self-employment tax and the
+  tips Schedule 1-A deducts for it, and of qualified REIT dividends, with
+  last year's loss carryforwards. It's no more than 20% of taxable income
+  less net capital gain and qualified dividends. Above the $197,300
+  ($394,600 joint) threshold, the Form 8995-A amount is asked for.
 - Schedule 8812: the child tax credit, the credit for other dependents, the
   phaseout, and the additional child tax credit (Parts II-A and II-B). This
   includes the identification number rules: a filer (one spouse on a joint
@@ -250,6 +256,13 @@ These give wrong answers for returns they affect, so they come first:
   only its share of self-employment tax, not of the self-employed health
   insurance or retirement plan deductions. Modified AGI doesn't add back
   excluded foreign or territory income (line 2e).
+- Qualified business income comes only from Schedules C and qualified
+  REIT dividends: no rentals, farms, partnerships, S corporations or
+  publicly traded partnerships, nor an agricultural cooperative's patrons.
+  It isn't reduced by the self-employed health insurance or retirement
+  plan deductions. Above the threshold, Form 8995-A (the wage and property
+  limits, and the phaseout for a specified service business) isn't
+  modeled: its result is asked for instead.
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -260,9 +273,9 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 8995, the qualified business income deduction
-2. An EIC qualifying child who isn't your dependent (Form 8332)
-3. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. An EIC qualifying child who isn't your dependent (Form 8332)
+2. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-4. Form 8615 (kiddie tax) and Form 6251 (AMT)
+3. Form 8615 (kiddie tax) and Form 6251 (AMT)
+4. Form 8995-A, above the qualified business income threshold
 5. Tax year 2026 (Rev. Proc. 2025-32)

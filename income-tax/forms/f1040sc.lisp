@@ -62,11 +62,30 @@
     (max $0 (min line29 (* (min home-office law/home-office-area) law/home-office-rate))))
   ; A loss is taken as all at risk (line 32a).
   (def line31 :label "Net profit or loss" (- line29 line30))
+  ; Its share of its owner's deductible self-employment tax, by profit,
+  ; among the deductions attributable to it.
+  (def se-deduction :label "Deductible part of self-employment tax attributable to it"
+    (if statutory-employee
+        $0
+        (* (max $0 line31) (if spouses spouse/se-deduction-rate you/se-deduction-rate))))
+
   ; For Schedule 1-A: tips customers paid by choice, included in receipts
-  ; reported on Forms 1099-NEC, 1099-MISC or 1099-K.
+  ; reported on Forms 1099-NEC, 1099-MISC or 1099-K. They count only up to
+  ; the business's net income (Multiple Trades or Businesses Worksheet,
+  ; column (j)), and only for an owner with a valid SSN.
   (input qualified-tips : usd :default $0
     :label "Of the receipts, tips received in an occupation listed at IRS.gov/TippedOccupations"
     :cite "IRC §224(c), (d)")
+  (def tips-counted :label "Qualified tips counted on Schedule 1-A, line 5" :cite "IRC §224(c), (e)"
+    (if (and (> qualified-tips $0) (if spouses spouse/valid-ssn you/valid-ssn))
+        (min qualified-tips (excess line31 se-deduction))
+        $0))
+
+  ; For Form 8995: its profit less the deductions attributable to it, and
+  ; less the part of its tips that Schedule 1-A deducts.
+  (def qbi :label "Qualified business income or loss" :cite "IRC §199A(c)(1), (c)(4)(D)"
+    (- line31 se-deduction
+       (if (= tips-counted $0) $0 (* tips-counted f1040s1a/tips-deducted-rate))))
 
   ; ---- Part III: Cost of goods sold ----
 

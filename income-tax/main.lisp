@@ -184,6 +184,10 @@
   (input qualified : usd :default $0 :label "Qualified dividends" :line 1b)
   (input cap-gain : usd :default $0 :label "Total capital gain distributions" :line 2a)
   (input withheld : usd :default $0 :label "Federal income tax withheld" :line 4)
+  ; Qualified REIT dividends, for Form 8995, if the shares were held more
+  ; than 45 days.
+  (input section-199a : usd :default $0 :label "Section 199A dividends" :line 5
+    :cite "IRC §199A(e)(3); Treas. Reg. §1.199A-3(c)(2)")
   (input exempt-interest : usd :default $0 :label "Exempt-interest dividends" :line 12))
 
 ; Sales of stock and other capital assets, as Forms 1099-B and 1099-DA
@@ -269,6 +273,20 @@
 
 (include "forms/f1040sc.lisp")
 
+; For the qualified business income deduction. Last year's Form 8995 lines
+; 16 and 17, as positive amounts.
+(input qbi-loss-carryforward : usd :default $0
+  :label "Qualified business net loss carried forward from last year" :line 3
+  :cite "IRC §199A(c)(2)")
+(input reit-ptp-loss-carryforward : usd :default $0
+  :label "Qualified REIT dividends and PTP loss carried forward from last year" :line 7)
+; Above the threshold the deduction takes Form 8995-A, with its limits by
+; W-2 wages and property and its phaseout for a specified service
+; business, which isn't modeled: its result is asked for instead.
+(input f8995a-deduction : usd
+  :label "Qualified business income deduction from Form 8995-A"
+  :cite "IRC §199A(b)(2), (b)(3), (d)(3)")
+
 (module law (include "law/2025.lisp"))
 
 (module f1040 (include "forms/f1040.lisp"))
@@ -295,6 +313,7 @@
 (module f8863 (include "forms/f8863.lisp"))
 (module f8880 (include "forms/f8880.lisp"))
 (module f8962 (include "forms/f8962.lisp"))
+(module f8995 (include "forms/f8995.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))

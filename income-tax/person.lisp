@@ -52,7 +52,7 @@
 
 (module f1040sse (include "forms/f1040sse.lisp"))
 ; The deductible part of self-employment tax per dollar of profit, to share
-; among this person's businesses by profit (Schedule 1-A, line 5).
+; among this person's businesses by profit (Schedule 1-A line 5, Form 8995).
 (def business-profit :label "Profit from businesses with self-employment income"
   (sum f1040scs (if (or statutory-employee (!= spouses is-spouse)) $0 (max $0 line31))))
 (def se-deduction-rate

@@ -10,10 +10,14 @@
           f1040s2/line4 $5,651.82
           f1040s1/line15 $2,825.91
           f1040/line11a $37,174.09
-          ; row middle $21,425: $1,192.50 + 12% × ($21,425 − $11,925)
-          f1040/line16 $2,333
-          f1040/line24 $7,984.82
-          f1040/line37 $7,984.82))
+          ; Form 8995: 20% of the $37,174.09 of qualified business income,
+          ; but no more than 20% of the $21,424.09 taxable before it
+          f1040/line13a $4,284.818
+          f1040/line15 $17,139.272
+          ; row middle $17,125: $1,192.50 + 12% × ($17,125 − $11,925)
+          f1040/line16 $1,817
+          f1040/line24 $7,468.82
+          f1040/line37 $7,468.82))
 
 (test "the 12.4% stops where wages and self-employment reach $176,100"
   (given filing-status 'single you/birth-date 1990-05-01)
@@ -69,11 +73,13 @@
   (expect f1040-eic/line1 $37,174.09
           ; row middle $37,175: $4,328 − 15.98% × ($37,175 − $23,350)
           f1040/line27a $2,119
-          ; tax $1,353 on $13,549.09 takes $1,353 of the $2,200 credit
-          f1040s8/line17 $847
-          f1040/line28 $847
+          ; less 20% of the $13,549.09 taxable before the QBI deduction
+          f1040/line13a $2,709.818
+          ; tax $1,083 (row middle $10,825) takes $1,083 of the $2,200 credit
+          f1040s8/line17 $1,117
+          f1040/line28 $1,117
           f1040/line24 $5,651.82                     ; self-employment tax only
-          f1040/line37 $2,685.82))
+          f1040/line37 $2,415.82))
 
 (test "self-employment is compensation for the IRA deduction"
   (given filing-status 'single you/birth-date 1990-05-01 you/ira-contributions $7,000)
