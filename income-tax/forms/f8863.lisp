@@ -38,12 +38,11 @@
 (def line4 phaseout-room)
 (def line6 phaseout-share)
 (def line7 (* line1 line6))
-; None of it refundable for someone under 24 who's supported much like a
-; dependent, with a parent alive, filing alone.
-(def age (age-on you/birth-date law/year-end))
-(def young-student :label "Under 24 and supported like a dependent" :cite "IRC §25A(i)(5)(B)"
-  (and (not joint) (not parents-deceased) (< age 24)
-       (or (< age 18) (and supported (or (= age 18) you/full-time-student)))))
+; None of it refundable for a child the kiddie tax applies to, whatever
+; their unearned income: under 24 and supported much like a dependent, with
+; a parent alive, filing alone.
+(def young-student :label "A child the kiddie tax applies to" :cite "IRC §25A(i)(5)"
+  f8615/child)
 (def line8 :label "Refundable American opportunity credit" :cite "IRC §25A(i)(5)"
   (if (or (= line7 $0) young-student) $0 (* law/aotc-refundable-rate line7)))
 

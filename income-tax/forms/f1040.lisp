@@ -76,12 +76,17 @@
         ((< income $25) $20)
         ((< income $3,000) (+ (floor $25 income) $12.50))
         (else (+ (floor $50 income) $25))))
-(defn tax-on [income : usd]
+(defn tax-on [income : usd status : filing-status]
   (round $1 (brackets (if (< income $100,000) (tax-table-row-middle income) income)
-                      law/brackets)))
+                      (law/brackets-for status))))
 
-(def line16 :label "Tax" :line 16 :cite "IRC §1"
-  (if (= f1040-qdcg/line4 $0) (tax-on line15) f1040-qdcg/line25))  ; any qualified dividends or net capital gain
+; With any qualified dividends or net capital gain, the Qualified Dividends
+; and Capital Gain Tax Worksheet's; for a child with unearned income over
+; the limit, Form 8615's.
+(def tax :label "Tax on taxable income" :cite "IRC §1"
+  (if (= f1040-qdcg/line4 $0) (tax-on line15 filing-status) f1040-qdcg/line25))
+(def line16 :label "Tax" :line 16 :cite "IRC §1(g)"
+  (if f8615/applies f8615/line18 tax))
 (def line17 :label "Amount from Schedule 2, Part I" :line 17 f1040s2/line3)
 (def line18 :line 18 (+ line16 line17))
 (def line19 :label "Child tax credit or credit for other dependents" :line 19

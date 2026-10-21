@@ -98,15 +98,16 @@
 
 (input claimed-as-dependent : bool :default false
   :label "Someone can claim you as a dependent" :line 12a)
-; For whether your American opportunity credit can be refundable (Form 8863,
-; line 7): not if you're under 24 and supported much like a dependent, such
-; as a full-time student (`you/full-time-student`).
+; For whether you're a child the kiddie tax applies to (Form 8615), and so
+; whether your American opportunity credit can be refundable (Form 8863,
+; line 7): at 18, or as a full-time student (`you/full-time-student`) under
+; 24, only if supported much like a dependent.
 (input supported : bool :default false
-  :label "Your earned income was less than half of your own support"
-  :cite "IRC §25A(i)(5)(B), §1(g)(2)(A)")
+  :label "Your earned income was no more than half of your own support"
+  :cite "IRC §1(g)(2)(A)(ii)(II)")
 (input parents-deceased : bool :default false
   :label "Neither of your parents was alive at the end of the year"
-  :cite "IRC §25A(i)(5)(B), §1(g)(2)(B)")
+  :cite "IRC §1(g)(2)(B)")
 
 (input spouse-itemizes : bool :default false
   :label "Married filing separately, and your spouse itemizes deductions" :line 12b
@@ -428,6 +429,25 @@
 
 (include "forms/f1040sc.lisp")
 
+; For the kiddie tax (Form 8615), when you're a child it applies to: from
+; the return of the parent whose rate it uses, and the Forms 8615 of the
+; parent's other children that use it too.
+(input parent-filing-status : filing-status :label "The parent's filing status (Form 8615, line C)")
+(input parent-taxable-income : usd :label "The parent's taxable income (Form 1040, line 15)" :line 6)
+(input parent-tax : usd
+  :label "The parent's tax (Form 1040, line 16), not counting any from Forms 4972 and 8814"
+  :line 10)
+(input parent-qualified-dividends : usd :default $0
+  :label "The parent's qualified dividends (Form 1040, line 3a)")
+(input parent-net-capital-gain : usd :default $0
+  :label "The parent's net capital gain: the smaller of Schedule D lines 15 and 16, or Form 1040 line 7a")
+(input other-children-unearned : usd :default $0
+  :label "The parent's other children's net unearned income (their Forms 8615, line 5)" :line 7)
+(input other-children-qualified-dividends : usd :default $0
+  :label "Of that, qualified dividends")
+(input other-children-net-capital-gain : usd :default $0
+  :label "Of that, net capital gain")
+
 ; For the qualified business income deduction. Last year's Form 8995 lines
 ; 16 and 17, as positive amounts.
 (input qbi-loss-carryforward : usd :default $0
@@ -445,7 +465,14 @@
 (module law (include "law/2025.lisp"))
 
 (module f1040 (include "forms/f1040.lisp"))
-(module f1040-qdcg (include "forms/f1040-qdcg.lisp"))
+(module f1040-qdcg
+  (def income f1040/line15)
+  (def qualified-dividends f1040/line3a)
+  ; Schedule D's net long-term gain, as far as the net gain goes: just the
+  ; capital gain distributions when they're all there is.
+  (def net-capital-gain (max $0 (min f1040sd/line15 f1040sd/line16)))
+  (def status filing-status)
+  (include "forms/f1040-qdcg.lisp"))
 ; Taxable social security benefits after the IRA deduction, and before it
 ; for figuring the deduction of someone covered by a retirement plan at
 ; work (Pub. 590-A, Appendix B, Worksheets 3 and 1).
@@ -469,6 +496,27 @@
 (module f8880 (include "forms/f8880.lisp"))
 (module f8962 (include "forms/f8962.lisp"))
 (module f8995 (include "forms/f8995.lisp"))
+(module f8615 (include "forms/f8615.lisp"))
+(module f8615-ws1 (include "forms/f8615-ws1.lisp"))
+(module f8615-ws3 (include "forms/f8615-ws3.lisp"))
+; The tax at the parent's rate on the child's net unearned income added to
+; the parent's taxable income (line 9), and at the child's on the rest
+; (line 15), each with its share of the qualified dividends and net
+; capital gain.
+(module f8615-qdcg9
+  (def income f8615/line8)
+  (def qualified-dividends
+    (+ f8615/line5-dividends parent-qualified-dividends other-children-qualified-dividends))
+  (def net-capital-gain
+    (+ f8615/line5-gain parent-net-capital-gain other-children-net-capital-gain))
+  (def status parent-filing-status)
+  (include "forms/f1040-qdcg.lisp"))
+(module f8615-qdcg15
+  (def income f8615/line14)
+  (def qualified-dividends (- f1040-qdcg/line2 f8615/line5-dividends))
+  (def net-capital-gain (- f1040-qdcg/line3 f8615/line5-gain))
+  (def status filing-status)
+  (include "forms/f1040-qdcg.lisp"))
 (module f1040sd (include "forms/f1040sd.lisp"))
 (module f1040sa (include "forms/f1040sa.lisp"))
 (module f1040sa-salt (include "forms/f1040sa-salt.lisp"))

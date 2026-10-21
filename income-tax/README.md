@@ -22,7 +22,7 @@ factlet eval main.lisp --set married=true f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `people` you may claim, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f8615`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`, `f8615-ws1`, `f8615-ws3`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; `f8615-qdcg9` and `f8615-qdcg15`, `f1040-qdcg` again for Form 8615; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -37,8 +37,11 @@ factlet eval main.lisp --set married=true f1040/line34
 - **Law lives only in `law/`.** Each value there has a `:cite`, and forms
   read it by name instead of repeating the number. Amounts that vary by
   filing status are a `table` on `filing-status`, and amounts that vary by
-  number of children are a list starting from none. A new tax year is a
-  new `law/<year>.lisp`.
+  number of children are a list starting from none. The tax brackets and
+  capital gain thresholds are functions of a filing status instead
+  (`law/brackets-for`), since the kiddie tax needs the parent's; a
+  function can't carry `:cite`, so it cites in its comment. A new tax year
+  is a new `law/<year>.lisp`.
 - **Totals keep the form's shape.** A line that adds lines not yet modeled
   lists them in a trailing comment, such as `; + 4b 5b 6b 8` on line 9, so
   `grep -n '; [+−]' forms/` finds every total that's still incomplete.
@@ -117,6 +120,16 @@ factlet eval main.lisp --set married=true f1040/line34
 - Tax from the Tax Table (the midpoint of each $25 or $50 row) below
   $100,000, the Tax Computation Worksheet from $100,000, and the Qualified
   Dividends and Capital Gain Tax Worksheet.
+- Form 8615, the kiddie tax: for a child under 18, or 18 or a full-time
+  student under 24 whose earned income was no more than half their support,
+  with a parent alive and not filing jointly, net unearned income over
+  $2,700 is taxed at the parent's rate. That's the parent's tax with it
+  added, less the parent's own, shared with the parent's other children,
+  plus the child's tax on the rest, if more than the child's tax alone.
+  Qualified dividends and net capital gain keep their rates, split by Line
+  5 Worksheet #1 or #3. The parent's taxable income, tax and filing status
+  are asked for. The same definition of a child keeps the American
+  opportunity credit from being refundable.
 - Schedule 1-A (2025–2028), deductions whether or not you itemize:
   - qualified tips, up to $25,000, from W-2s and from businesses, a
     business's only up to its profit less its share of its owner's
@@ -306,6 +319,13 @@ These give wrong answers for returns they affect, so they come first:
   plan deductions. Above the threshold, Form 8995-A (the wage and property
   limits, and the phaseout for a specified service business) isn't
   modeled: its result is asked for instead.
+- The kiddie tax counts all of a business's profit as earned income, not
+  just a reasonable allowance where capital matters, and leaves out the
+  early withdrawal penalty. It takes no itemized deductions as directly
+  connected with the unearned income (line 2, and Line 5 Worksheet #2),
+  and has no Schedule D Tax Worksheet for 28% rate or unrecaptured
+  section 1250 gain. It doesn't offer the parent's election to report the
+  child's income instead (Form 8814).
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -319,6 +339,6 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 8615 (kiddie tax) and Form 6251 (AMT)
+1. Form 6251, the alternative minimum tax
 2. Form 8995-A, above the qualified business income threshold
 3. Tax year 2026 (Rev. Proc. 2025-32)

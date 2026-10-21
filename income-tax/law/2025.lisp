@@ -33,9 +33,12 @@
 
 ; ---- Tax rates ----
 
-; Each rate applies up to the edge after it.
-(def brackets :cite "IRC §1(j)(2); Rev. Proc. 2024-40 §3.01"
-  (table filing-status
+; Each rate applies up to the edge after it. Functions of a filing status,
+; as Form 8615 taxes a child's unearned income at the parent's, and cited
+; here since a function has no :cite: IRC §1(j)(2); Rev. Proc. 2024-40
+; §3.01.
+(defn brackets-for [status : filing-status]
+  (table status
     single
     [10% $11,925  12% $48,475  22% $103,350  24% $197,300  32% $250,525  35% $626,350  37%]
     (married-joint qualifying-surviving-spouse)
@@ -46,14 +49,15 @@
     [10% $17,000  12% $64,850  22% $103,350  24% $197,300  32% $250,500  35% $626,350  37%]))
 
 ; Qualified dividends and net capital gain are taxed at 0% up to the first
-; amount, 15% up to the second, and 20% above.
-(def cg-0%-top :cite "IRC §1(j)(5)(B)(i); Rev. Proc. 2024-40 §3.03"
-  (table filing-status
+; amount, 15% up to the second, and 20% above: IRC §1(j)(5)(B); Rev. Proc.
+; 2024-40 §3.03.
+(defn cg-0%-top-for [status : filing-status]
+  (table status
     (single married-separate)                   $48,350
     (married-joint qualifying-surviving-spouse) $96,700
     head-of-household                           $64,750))
-(def cg-15%-top :cite "IRC §1(j)(5)(B)(ii); Rev. Proc. 2024-40 §3.03"
-  (table filing-status
+(defn cg-15%-top-for [status : filing-status]
+  (table status
     single                                      $533,400
     (married-joint qualifying-surviving-spouse) $600,050
     married-separate                            $300,000
