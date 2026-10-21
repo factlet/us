@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $0 ss-wages $60,000))
   (member f1040scs consulting (given receipts $40,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f1040s1/line15 $2,825.91
           f8995/line2 $37,174.09                     ; $40,000 − $2,825.91
           f8995/line5 $7,434.818
@@ -19,7 +19,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member f1040scs consulting (given receipts $40,000))
   (member f1099-divs fund (given ordinary $10,000 qualified $10,000))
-  (empty w2s f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f8995/line10 $7,434.818
           f8995/line11 $31,424.09                    ; $47,174.09 − $15,750
           f8995/line12 $10,000
@@ -31,7 +31,7 @@
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $0))
   (member f1040scs shop (given receipts $5,000 other-expenses $8,000))
   (member f1099-divs reit (given ordinary $1,000 section-199a $1,000))
-  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f8995/line2 -$3,000
           f8995/line4 $0
           f8995/line9 $200
@@ -42,7 +42,7 @@
   (given filing-status 'single you/birth-date 1990-05-01 qbi-loss-carryforward $7,174.09)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $0 ss-wages $60,000))
   (member f1040scs consulting (given receipts $40,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f8995/line4 $30,000
           f8995/line15 $6,000
           f8995/line16 $0))
@@ -54,7 +54,7 @@
            qualified-tips $30,000))
   (member f1040scs tours
     (given receipts $50,000 other-expenses $10,000 qualified-tips $20,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   ; $50,000 of tips, of which $25,000 is deducted: half of each job's
   (expect f1040s1a/line13 $25,000
           f1040s1a/tips-deducted-rate 0.5
@@ -65,7 +65,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s a (given wages $210,000 medicare-wages $210,000 withheld $0))
   (member f1099-divs reit (given ordinary $3,050 section-199a $3,050))
-  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8995/line11 $197,300                      ; at the threshold
           f1040/line13a $610)
   (member w2s b (given wages $1 medicare-wages $1 withheld $0))

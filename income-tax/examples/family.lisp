@@ -6,5 +6,5 @@
 (member w2s globex (given wages $50,000 medicare-wages $50,000 withheld $2,000))
 (member f1099-ints bank (given interest $500))
 (empty f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
-(member dependents ada (given birth-date 2020-04-01 qualifying-child true tin 'ssn))
-(member dependents bo (given birth-date 2015-09-15 qualifying-child true tin 'ssn))
+(member people ada (given birth-date 2020-04-01 relationship 'child tin 'ssn))
+(member people bo (given birth-date 2015-09-15 relationship 'child tin 'ssn))

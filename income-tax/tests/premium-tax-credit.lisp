@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1990-05-01 marketplace true)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1095-as plan (given premiums $6,000 slcsp $7,200 advance $3,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8962/line4 $15,060
           f8962/line5 199                            ; $30,000 ÷ $15,060
           f8962/line7 0.0196                         ; Table 2 for 199
@@ -19,7 +19,7 @@
   (given filing-status 'single you/birth-date 1990-05-01 marketplace true)
   (member w2s acme (given wages $45,000 medicare-wages $45,000 withheld $0))
   (member f1095-as plan (given premiums $6,000 slcsp $6,000 advance $5,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8962/line5 298
           f8962/line7 0.0592
           f8962/line24 $3,336                        ; $6,000 − $2,664
@@ -32,7 +32,7 @@
   (given filing-status 'single you/birth-date 1990-05-01 marketplace true)
   (member w2s acme (given wages $70,000 medicare-wages $70,000 withheld $0))
   (member f1095-as plan (given premiums $9,000 slcsp $9,000 advance $5,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8962/line5 401
           f8962/line7 0.085
           f8962/line24 $3,050                        ; $9,000 − $5,950
@@ -40,17 +40,17 @@
 
 (test "the applicable figure follows Table 2 between its points"
   (given filing-status 'single)
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (member w2s a (given wages $45,400 medicare-wages $45,400 withheld $0))
   (expect f8962/line5 301 f8962/line7 0.0603)
   (member w2s b (given wages $7,500 medicare-wages $7,500 withheld $0))
   (expect f8962/line5 351 f8962/line7 0.0728))
 
 (test "the poverty line grows with the family, and is higher in Alaska"
-  (given filing-status 'married-joint)
+  (given filing-status 'married-joint you/birth-date 1990-01-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $0))
-  (member dependents a (given birth-date 2019-01-01 qualifying-child true tin 'ssn))
-  (member dependents b (given birth-date 2021-01-01 qualifying-child true tin 'ssn))
+  (member people a (given birth-date 2019-01-01 relationship 'child tin 'ssn))
+  (member people b (given birth-date 2021-01-01 relationship 'child tin 'ssn))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f8962/line1 4
           f8962/line4 $31,200
@@ -66,7 +66,7 @@
   (member w2s acme (given wages $20,000 medicare-wages $20,000 withheld $0))
   (member f1099-ints muni (given interest $0 tax-exempt-interest $2,000))
   (member ssa1099s you (given net-benefits $10,000))
-  (empty f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs dependents)
+  (empty f1099-divs f1099-bs f1099-gs f1099-rs f1098-es f1040scs people)
   (expect f1040/line6b $1,000
           f1040/line11a $21,000
           f8962/line2a $32,000))                     ; + $2,000 + $9,000
@@ -76,7 +76,7 @@
          marketplace-months 6)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1095-as plan (given premiums $3,000 slcsp $3,200 advance $1,500))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8962/line8b $49
           f8962/line11c $294                         ; 6 × $49
           f8962/line24 $2,906
@@ -86,7 +86,7 @@
   (given filing-status 'married-separate you/birth-date 1990-05-01 marketplace true)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1095-as plan (given premiums $6,000 slcsp $7,200 advance $3,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f8962/line24 $0
           f8962/line29 $750)                         ; not single, under 200%
   (given ptc-separate-exception true)

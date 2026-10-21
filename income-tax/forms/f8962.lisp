@@ -5,11 +5,11 @@
 ; You, your spouse on a joint return, and your dependents, but not someone
 ; another taxpayer can claim.
 (def line1 :label "Tax family size"
-  (+ (if claimed-as-dependent 0 1) (if joint 1 0) (count dependents true)))
+  (+ (if claimed-as-dependent 0 1) (if joint 1 0) (count people dependent)))
 ; Worksheet 1-1: AGI, with tax-exempt interest and untaxed social security.
 (def line2a :label "Modified AGI" :cite "IRC §36B(d)(2)(B)"
   (+ f1040/line11a f1040/line2a (excess f1040/line6a f1040/line6b)))  ; + Form 2555
-(def line2b :label "Dependents' modified AGI" (sum dependents magi))
+(def line2b :label "Dependents' modified AGI" (sum people (if dependent magi $0)))
 (def line3 :label "Household income" (max $0 (+ line2a line2b)))
 (def line4 :label "Federal poverty line" :cite "IRC §36B(d)(3)"
   (+ law/poverty-line (* (- line1 1) law/poverty-line-per-person)))

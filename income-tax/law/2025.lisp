@@ -109,6 +109,9 @@
 ; earned income plus the addition, but no more than the usual amount.
 (def dependent-std-minimum :cite "IRC §63(c)(5)(A); Rev. Proc. 2024-40" $1,350)
 (def dependent-std-addition :cite "IRC §63(c)(5)(B); Rev. Proc. 2024-40" $450)
+; A qualifying relative's gross income must be under the exemption amount,
+; which still counts for this though the exemption itself is zero.
+(def qualifying-relative-income-limit :cite "IRC §152(d)(1)(B); Rev. Proc. 2024-40" $5,200)
 ; Per filer who is 65 or older, and again per filer who is blind.
 (def aged-blind-addition :cite "IRC §63(f); Rev. Proc. 2024-40"
   (table filing-status

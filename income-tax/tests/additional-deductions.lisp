@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s cafe
     (given wages $40,000 medicare-wages $40,000 withheld $0 qualified-tips $8,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line13 ?)                         ; the tips ask for the SSN
   (given you/tin 'itin)
   (expect f1040s1a/line13 $0)
@@ -23,7 +23,7 @@
   (member w2s theirs
     (given wages $112,900 medicare-wages $112,900 withheld $0 qualified-tips $10,000
            spouses true))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line6 $30,000
           f1040s1a/line7 $25,000
           f1040s1a/line10 $12,900
@@ -39,7 +39,7 @@
   (given filing-status 'single you/tin 'ssn)
   (member w2s plant
     (given wages $160,500 medicare-wages $160,500 withheld $0 qualified-overtime $14,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line14a $14,000
           f1040s1a/line15 $12,500
           f1040s1a/line18 $10,500
@@ -55,7 +55,7 @@
     (given wages $50,000 medicare-wages $50,000 withheld $0
            qualified-tips $5,000 qualified-overtime $2,000))
   (member vehicle-loans truck (given interest $3,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   ; and no SSN asked for
   (expect f1040s1a/line13 $0
           f1040s1a/line21 $0
@@ -65,7 +65,7 @@
 (test "car loan interest up to $10,000, less $200 for each $1,000 or part over $100,000"
   (given filing-status 'single)
   (member w2s acme (given wages $105,500 medicare-wages $105,500 withheld $0))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040s1a/line23 $0)                        ; no loans asked about
   (given vehicle-loan true)
   (expect f1040s1a/line23 ?)
@@ -85,7 +85,7 @@
   ; $400 of profit, so $369.40 of net earnings: no self-employment tax
   (member f1040scs rideshare (given receipts $5,000 car $4,600 qualified-tips $1,800))
   (member f1040scs tutoring (given receipts $1,000 supplies $1,500 qualified-tips $300))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line12 $0
           f1040s1a/line5 $400
           f1040s1a/line13 $400))
@@ -94,7 +94,7 @@
   (given filing-status 'single you/birth-date 1990-05-01 you/tin 'ssn)
   (member f1040scs consulting (given receipts $40,000))
   (member f1040scs tours (given receipts $50,000 other-expenses $10,000 qualified-tips $38,000))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/business-profit $80,000
           f1040s1/line15 $5,651.82                   ; half of 15.3% × $73,880
           ; half of it for the tours' half of the profit: $40,000 − $2,825.91

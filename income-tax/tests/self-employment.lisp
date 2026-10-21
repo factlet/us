@@ -3,7 +3,7 @@
 (test "self-employment tax is 15.3% of 92.35% of the profit, half of it deducted"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member f1040scs consulting (given receipts $40,000))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line4a $36,940
           you/f1040sse/line10 $4,580.56              ; 12.4%
           you/f1040sse/line11 $1,071.26              ; 2.9%
@@ -24,7 +24,7 @@
   (member w2s acme
     (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
   (member f1040scs consulting (given receipts $40,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line9 $26,100
           you/f1040sse/line10 $3,236.40              ; 12.4% × $26,100
           you/f1040sse/line12 $4,307.66
@@ -35,7 +35,7 @@
   ; No social security wages asked.
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member f1040scs side (given receipts $400))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line4c $369.40
           you/f1040sse/required false
           f1040s2/line4 $0))
@@ -43,7 +43,7 @@
 (test "statutory employee income is income and earned income, but not self-employment"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member f1040scs route (given receipts $30,000 statutory-employee true))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f1040s1/line3 $30,000
           you/f1040sse/line2 $0
           f1040s2/line4 $0
@@ -57,7 +57,7 @@
     (given wages $150,000 medicare-wages $150,000 withheld $0 ss-wages $150,000))
   (member f1040scs yours (given receipts $40,000))
   (member f1040scs theirs (given receipts $80,000 spouses true))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect you/f1040sse/line12 $4,307.66              ; past the wage base
           spouse/f1040sse/line9 $176,100             ; none of it used
           spouse/f1040sse/line12 $11,303.64          ; 15.3% × $73,880
@@ -67,7 +67,7 @@
 (test "self-employment is earned income for the EIC and the additional child tax credit"
   (given filing-status 'head-of-household you/birth-date 1990-05-01 you/tin 'ssn)
   (member f1040scs consulting (given receipts $40,000))
-  (member dependents kid (given birth-date 2018-01-01 qualifying-child true tin 'ssn))
+  (member people kid (given birth-date 2018-01-01 relationship 'child tin 'ssn))
   (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s)
   ; Worksheet B: the Schedule SE profit less the half deducted.
   (expect f1040-eic/line1 $37,174.09
@@ -84,6 +84,6 @@
 (test "self-employment is compensation for the IRA deduction"
   (given filing-status 'single you/birth-date 1990-05-01 you/ira-contributions $7,000)
   (member f1040scs consulting (given receipts $40,000))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
   (expect f1040s1-ira/line9 $37,174.09              ; less the half deducted
           f1040s1/line20 $7,000))

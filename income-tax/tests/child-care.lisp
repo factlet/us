@@ -6,8 +6,8 @@
          you/birth-date 1985-01-01 you/tin 'ssn spouse/birth-date 1987-01-01 spouse/tin 'ssn)
   (member w2s yours (given wages $30,000 medicare-wages $30,000 withheld $0))
   (member w2s theirs (given wages $20,000 medicare-wages $20,000 withheld $0 spouses true))
-  (member dependents kid
-    (given birth-date 2020-01-01 qualifying-child true tin 'ssn care-expenses $4,000))
+  (member people kid
+    (given birth-date 2020-01-01 relationship 'child tin 'ssn care-expenses $4,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line3 $3,000
           f2441/line6 $3,000
@@ -22,10 +22,10 @@
 (test "35% less 1% for each $2,000 over $15,000; two children, up to $6,000"
   (given filing-status 'head-of-household you/birth-date 1990-01-01 you/tin 'ssn)
   (member w2s acme (given wages $30,000 medicare-wages $30,000 withheld $0))
-  (member dependents a
-    (given birth-date 2019-01-01 qualifying-child true tin 'ssn care-expenses $3,500))
-  (member dependents b
-    (given birth-date 2021-01-01 qualifying-child true tin 'ssn care-expenses $3,500))
+  (member people a
+    (given birth-date 2019-01-01 relationship 'child tin 'ssn care-expenses $3,500))
+  (member people b
+    (given birth-date 2021-01-01 relationship 'child tin 'ssn care-expenses $3,500))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line3 $6,000
           f2441/line8 27%                            ; 35% − 8%
@@ -40,8 +40,8 @@
   (given filing-status 'married-joint
          you/birth-date 1985-01-01 spouse/birth-date 1987-01-01 spouse/care-deemed-months 9)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
-  (member dependents kid
-    (given birth-date 2020-01-01 qualifying-child true tin 'ssn care-expenses $3,000))
+  (member people kid
+    (given birth-date 2020-01-01 relationship 'child tin 'ssn care-expenses $3,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect spouse/earned-income $2,250
           f2441/line6 $2,250
@@ -51,10 +51,10 @@
   (given filing-status 'head-of-household you/birth-date 1990-01-01)
   (member w2s acme
     (given wages $50,000 medicare-wages $50,000 withheld $0 dependent-care $5,000))
-  (member dependents a
-    (given birth-date 2019-01-01 qualifying-child true tin 'ssn care-expenses $4,000))
-  (member dependents b
-    (given birth-date 2021-01-01 qualifying-child true tin 'ssn care-expenses $4,000))
+  (member people a
+    (given birth-date 2019-01-01 relationship 'child tin 'ssn care-expenses $4,000))
+  (member people b
+    (given birth-date 2021-01-01 relationship 'child tin 'ssn care-expenses $4,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line25 $5,000
           f2441/line26 $0
@@ -66,8 +66,8 @@
   (given filing-status 'single you/birth-date 1990-01-01)
   (member w2s acme
     (given wages $40,000 medicare-wages $40,000 withheld $0 dependent-care $5,000))
-  (member dependents kid
-    (given birth-date 2020-01-01 qualifying-child true tin 'ssn care-expenses $3,000))
+  (member people kid
+    (given birth-date 2020-01-01 relationship 'child tin 'ssn care-expenses $3,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line26 $2,000
           f1040/line1e $2,000
@@ -77,19 +77,21 @@
 (test "married filing separately takes it only when considered unmarried"
   (given filing-status 'married-separate you/birth-date 1990-01-01)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
-  (member dependents kid
-    (given birth-date 2020-01-01 qualifying-child true tin 'ssn care-expenses $2,000))
+  (member people kid
+    (given birth-date 2020-01-01 relationship 'child tin 'ssn care-expenses $2,000))
   (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs)
   (expect f2441/line11 $0)
   (given considered-unmarried true)
   (expect f2441/line11 $440))                        ; 22% × $2,000
 
 (test "a child counts only before turning 13, unless disabled"
-  (given filing-status 'single)
-  (member dependents a (given birth-date 2012-01-01 qualifying-child true tin 'ssn)
+  (given filing-status 'single you/birth-date 1990-01-01)
+  (member people a (given birth-date 2012-01-01 relationship 'child tin 'ssn)
     (expect care-person false))                      ; 13 all year
-  (member dependents b (given birth-date 2012-01-02 qualifying-child true tin 'ssn)
+  (member people b (given birth-date 2012-01-02 relationship 'child tin 'ssn)
     (expect care-person true))                       ; 12 on January 1
-  (member dependents c (given birth-date 2005-01-01 qualifying-child false tin 'ssn disabled true)
+  (member people c
+    (given birth-date 2005-01-01 relationship 'sibling tin 'ssn disabled true
+           gross-income $0 supported true)
     (expect care-person true))
   (expect f2441/persons 2))

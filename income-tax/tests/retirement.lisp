@@ -4,7 +4,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member f1099-rs pension (given gross $30,000 taxable $28,000 withheld $3,000))
   (member f1099-rs ira (given gross $10,000 taxable $10,000 withheld $1,000 ira true))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
   (expect f1040/line4a $10,000
           f1040/line4b $10,000
           f1040/line5a $30,000
@@ -20,7 +20,7 @@
   (given filing-status 'single you/birth-date 1980-01-01)
   (member f1099-rs all (given gross $20,000 taxable $20,000 ira true rolled-over $20,000))
   (member f1099-rs part (given gross $5,000 taxable $5,000 ira true rolled-over $3,000))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
   (expect f1040/line4a $25,000
           f1040/line4b $2,000
           f1040/line9 $2,000))
@@ -29,7 +29,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $50,000 medicare-wages $50,000 withheld $5,000))
   (member f1099-rs plan (given gross $10,000 taxable $10,000 withheld $2,000 early true))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1098-es ssa1099s f1040scs people)
   (expect f1040/line5b $10,000
           f1040/line15 $44,250
           ; row middle $44,275: $1,192.50 + 12% × ($44,275 − $11,925)
@@ -47,7 +47,7 @@
   (given filing-status 'single you/birth-date 1955-06-01 you/tin 'ssn)
   (member ssa1099s you (given net-benefits $20,000))
   (member f1099-rs pension (given gross $25,000 taxable $25,000))
-  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es f1040scs dependents)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1098-es f1040scs people)
   (expect f1040-ssb/line5 $35,000                    ; $10,000 + $25,000
           f1040-ssb/line14 $4,500                    ; half of $9,000
           f1040-ssb/line15 $850                      ; 85% × $1,000

@@ -23,6 +23,16 @@
 ; Coverage under a high-deductible health plan, for an HSA.
 (enum hdhp no-hdhp self-only family)
 
+; How someone you may claim is related to you:
+;   child           son, daughter, stepchild, adopted child, or a foster child
+;                   placed with you by an agency or a court
+;   sibling         brother or sister, half or step
+;   descendant      a descendant of either, such as a grandchild, niece or nephew
+;   parent          father, mother, stepparent, or an ancestor such as a grandparent
+;   other-relative  aunt, uncle, or an in-law
+;   unrelated       anyone else
+(enum relationship child sibling descendant parent other-relative unrelated)
+
 ; Where you lived, for the federal poverty line: Alaska's and Hawaii's are
 ; higher than the rest of the country's.
 (enum residence states-dc alaska hawaii)
@@ -90,34 +100,112 @@
 (def filer-has-ssn :cite "IRC §24(h)(7)(A)(i)"
   (or you/valid-ssn (and joint spouse/valid-ssn)))
 
-(collection dependents :label "Dependents"
+; Children, relatives and household members you may be able to claim. Each
+; is a dependent as a qualifying child or a qualifying relative, by Steps 1
+; through 5 of the instructions; some who aren't, such as a child who
+; supports themselves, still count for the EIC.
+(collection people :label "Children, relatives and household members you may be able to claim"
   (input birth-date : date :label "Date of birth")
-  (input qualifying-child : bool :label "Your qualifying child" :cite "IRC §152(c)")
+  (input relationship : relationship :label "Relationship to you" :cite "IRC §152(c)(2), (d)(2)")
   (input tin : tin :label "Identification number issued by the return's due date")
+  ; Time away at school, on vacation, in the hospital or in the military
+  ; counts as time with you; so does all of a life that began or ended in
+  ; the year, if it was more than half spent with you.
+  (input lived-apart : bool :default false
+    :label "Lived with you for half the year or less" :cite "IRC §152(c)(1)(B)")
+  (input full-time-student : bool :default false
+    :label "A full-time student for some part of 5 months of the year"
+    :cite "IRC §152(c)(3)(A)(ii), (f)(2)")
+  (input permanently-disabled : bool :default false
+    :label "Permanently and totally disabled at any time in the year" :cite "IRC §152(c)(3)(B)")
+  (input own-support : bool :default false
+    :label "Provided over half of their own support" :cite "IRC §152(c)(1)(D)")
+  (input married : bool :default false :label "Married at the end of the year")
+  (input joint-return : bool :default false
+    :label "Files a joint return, other than only to claim a refund"
+    :cite "IRC §152(b)(2), (c)(1)(E)")
   ; Someone who isn't can still be a dependent while living in Canada or
-  ; Mexico (IRC §152(b)(3)), but gets neither credit.
+  ; Mexico, but gets neither credit.
   (input nonresident-alien : bool :default false
     :label "Not a U.S. citizen, national or resident alien" :cite "IRC §24(c)(2), (h)(4)(B)")
+  (input canada-mexico : bool :default false
+    :label "Lived in Canada or Mexico" :cite "IRC §152(b)(3)(A)")
   (input lived-abroad : bool :default false
     :label "Lived with you outside the United States for more than half the year"
     :cite "IRC §32(c)(3)(C)")
-  ; A noncustodial parent's child by the custodial parent's release is a
-  ; dependent for the child tax credit, but not a qualifying child for the
-  ; EIC or a qualifying person for the child and dependent care credit,
-  ; which stay with the custodial parent.
-  (input released-to-you : bool :default false
-    :label "Your child as the noncustodial parent: the custodial parent released the claim to you (Form 8332)"
+  ; Children of divorced or separated parents: the custodial parent's
+  ; release makes the child the other parent's dependent, but leaves the
+  ; EIC and the child and dependent care credit with the custodial parent.
+  (input released : bool :default false
+    :label "As the custodial parent, you released your claim to them to the other parent (Form 8332)"
     :cite "IRC §152(e)")
+  (input released-to-you : bool :default false
+    :label "As the noncustodial parent, the custodial parent released their claim to them to you (Form 8332)"
+    :cite "IRC §152(e)")
+
+  ; ---- Qualifying child (Step 1) ----
+
+  ; Younger than you (or your spouse on a joint return) and under 19, or a
+  ; student under 24, at the end of the year; or permanently and totally
+  ; disabled. A child turns 19 on their 19th birthday.
+  (def age-test :label "Meets the age test" :cite "IRC §152(c)(3)"
+    (or permanently-disabled
+        (and (or (< (age-on birth-date law/year-end) 19)
+                 (and full-time-student (< (age-on birth-date law/year-end) 24)))
+             (or (> birth-date you/birth-date) (and joint (> birth-date spouse/birth-date))))))
+  ; Everything but the support test, which the EIC goes without.
+  (def child-tests :label "Meets the relationship, residency, age and joint return tests"
+    :cite "IRC §152(c)(1)(A)–(C), (E)"
+    (and (or (= relationship 'child) (= relationship 'sibling) (= relationship 'descendant))
+         (not lived-apart) (not joint-return) age-test))
+  (def qualifying-child :label "Your qualifying child" :cite "IRC §152(c), (e)"
+    (or released-to-you (and child-tests (not own-support) (not released))))
+
+  ; ---- Qualifying relative (Step 4) ----
+
+  ; Anyone else who lived with you all year counts as a household member,
+  ; if the relationship doesn't violate local law.
+  (input household-all-year : bool
+    :label "Lived with you all year as a member of your household"
+    :cite "IRC §152(d)(2)(H), (f)(3)")
+  ; Such as your partner's child, when your partner has to file.
+  (input others-qualifying-child : bool :default false
+    :label "Someone else's qualifying child, who has to file a return" :cite "IRC §152(d)(1)(D)")
+  (input gross-income : usd
+    :label "Their gross income for the year, leaving out tax-exempt income such as most social security"
+    :cite "IRC §152(d)(1)(B)")
+  (input supported : bool :label "You provided over half of their support"
+    :cite "IRC §152(d)(1)(C)")
+  (def qualifying-relative :label "Your qualifying relative" :cite "IRC §152(d)"
+    (and (not qualifying-child) (not released) (not own-support) (not joint-return)
+         (not others-qualifying-child)
+         (or (!= relationship 'unrelated) household-all-year)
+         (< gross-income law/qualifying-relative-income-limit)
+         supported))
+
+  ; ---- Dependent (Steps 2 and 4) ----
+
+  ; Nobody is your dependent if you can be claimed yourself, unless you file
+  ; jointly.
+  (def dependent :label "Your dependent" :cite "IRC §152(a), (b)"
+    (and (or joint (not claimed-as-dependent))
+         (or (not nonresident-alien) canada-mexico)
+         (or qualifying-child qualifying-relative)))
+
   ; For the child and dependent care credit (Form 2441, line 2).
   (input disabled : bool :default false
     :label "Not physically or mentally able to care for themselves" :cite "IRC §21(b)(1)")
   (input care-expenses : usd :default $0
     :label "Care expenses you paid for them so you could work" :cite "IRC §21(b)(2)")
-  ; Under 13 for some of the year: expenses only for that part count.
+  ; A dependent qualifying child under 13 for some of the year (expenses
+  ; only for that part count), or a disabled dependent who lived with you;
+  ; a child released to the other parent stays the custodial parent's.
   (def care-person :label "A qualifying person for the child and dependent care credit"
     :cite "IRC §21(b)(1), (e)(5)"
     (and (not released-to-you)
-         (or (and qualifying-child (< (age-on birth-date law/year-start) 13)) disabled)))
+         (or (and (< (age-on birth-date law/year-start) 13)
+                  (or released (and dependent qualifying-child)))
+             (and disabled (not lived-apart) (or released dependent)))))
   ; As a student, for an education credit (Form 8863, Part III, lines 23
   ; through 31).
   (input education-expenses : usd :default $0
@@ -131,7 +219,7 @@
   (input drug-felony : bool :default false
     :label "Convicted of a felony for a controlled substance" :line 26)
   (def aotc-student :label "Takes the American opportunity credit" :cite "IRC §25A(b)(2)"
-    (and (> education-expenses $0) (!= tin 'no-tin) (not aotc-four-years)
+    (and (> education-expenses $0) dependent (!= tin 'no-tin) (not aotc-four-years)
          (not less-than-half-time) (not four-years-done) (not drug-felony)))
   ; For the premium tax credit's household income (Form 8962, Worksheet 1-2).
   (input magi : usd :default $0
@@ -140,46 +228,20 @@
   ; A child turns 17 on their 17th birthday (Rev. Rul. 2003-72), so one
   ; born after 2008-12-31 is under 17 at the end of 2025.
   (def ctc-child :label "Qualifies for the child tax credit" :cite "IRC §24(c), (e), (h)(7)"
-    (and qualifying-child (not nonresident-alien) (< (age-on birth-date law/year-end) 17)
+    (and dependent qualifying-child (not nonresident-alien) (< (age-on birth-date law/year-end) 17)
          (= tin 'ssn) filer-has-ssn filers-have-tins))
-  ; Everyone else with a number, including a child under 17 who misses the
-  ; credit only for want of an SSN.
+  ; Every other dependent with a number, including a child under 17 who
+  ; misses the credit only for want of an SSN.
   (def odc-dependent :label "Qualifies for the credit for other dependents"
     :cite "IRC §24(h)(4)"
-    (and (not ctc-child) (not nonresident-alien) (!= tin 'no-tin) filers-have-tins))
-  ; The EIC also wants the home you shared in the United States. A child
-  ; without a valid SSN is still your qualifying child, but isn't counted
-  ; toward the credit.
+    (and dependent (not ctc-child) (not nonresident-alien) (!= tin 'no-tin) filers-have-tins))
+  ; The EIC takes a qualifying child without the support test or the
+  ; release, a married one only if your dependent (or released), and only
+  ; one who lived with you in the United States. A child without a valid
+  ; SSN is still your qualifying child, but isn't counted toward the credit.
   (def eic-qualifying-child :label "Your qualifying child for the EIC" :cite "IRC §32(c)(3)"
-    (and qualifying-child (not released-to-you) (not lived-abroad)))
-  (def eic-child :label "Counts toward the EIC" :cite "IRC §32(c)(3)(D), (m)"
-    (and eic-qualifying-child (= tin 'ssn))))
-
-; Qualifying children you don't claim as dependents, listed only on
-; Schedule EIC: one whose claim you released to the other parent as the
-; custodial parent, or one who provided over half of their own support.
-; The EIC ignores both rules, and the child and dependent care credit the
-; first. A married child counts only if released.
-(input nondependent-child : bool :default false
-  :label "A qualifying child lived with you whom you aren't claiming as a dependent"
-  :cite "IRC §32(c)(3)(A), (B)")
-(collection nondependent-children :label "Qualifying children who aren't your dependents"
-  (input birth-date : date :label "Date of birth")
-  (input tin : tin :label "Identification number issued by the return's due date")
-  (input released : bool :default false
-    :label "You released your claim to them to the other parent (Form 8332)" :cite "IRC §152(e)")
-  (input lived-abroad : bool :default false
-    :label "Lived with you outside the United States for more than half the year"
-    :cite "IRC §32(c)(3)(C)")
-  (input disabled : bool :default false
-    :label "Not physically or mentally able to care for themselves" :cite "IRC §21(b)(1)")
-  (input care-expenses : usd :default $0
-    :label "Care expenses you paid for them so you could work" :cite "IRC §21(b)(2)")
-  (def care-person :label "A qualifying person for the child and dependent care credit"
-    :cite "IRC §21(e)(5)"
-    (and released (or (< (age-on birth-date law/year-start) 13) disabled)))
-  (def eic-qualifying-child :label "Your qualifying child for the EIC" :cite "IRC §32(c)(3)"
-    (not lived-abroad))
+    (and child-tests (not released-to-you) (not lived-abroad)
+         (or (not married) dependent released)))
   (def eic-child :label "Counts toward the EIC" :cite "IRC §32(c)(3)(D), (m)"
     (and eic-qualifying-child (= tin 'ssn))))
 

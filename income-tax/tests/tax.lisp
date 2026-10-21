@@ -4,7 +4,7 @@
 (test "the Tax Table taxes the middle of the row"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $58,000 medicare-wages $58,000))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   ; row $42,250–$42,300: $1,192.50 + 12% × ($42,275 − $11,925)
   (expect f1040/line15 $42,250
           f1040/line16 $4,835))
@@ -13,7 +13,7 @@
 (test "the Tax Table's rows are irregular at the bottom, then $25, then $50"
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $15,750 medicare-wages $15,750))  ; exactly the deduction
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (member w2s a (given wages $4 medicare-wages $4))
   (expect f1040/line15 $4 f1040/line16 $0)            ; row $0–$5
   (member w2s b (given wages $6 medicare-wages $6))
@@ -30,7 +30,7 @@
   (given filing-status 'married-joint
          you/birth-date 1980-01-01 spouse/birth-date 1982-01-01)
   (member w2s acme (given wages $131,500 medicare-wages $131,500))
-  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   ; $2,385 + 12% × $73,100 + 22% × ($100,000 − $96,950)
   (expect f1040/line15 $100,000
           f1040/line16 $11,828))
@@ -39,7 +39,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $60,000 medicare-wages $60,000 withheld $7,000))
   (member f1099-divs fund (given ordinary $10,000 qualified $10,000))
-  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040/line15 $54,250
           f1040-qdcg/line5 $44,250
           f1040-qdcg/line9 $4,100                    ; up to $48,350 at 0%
@@ -56,7 +56,7 @@
   (given filing-status 'single you/birth-date 1990-05-01)
   (member w2s acme (given wages $40,000 medicare-wages $40,000 withheld $0))
   (member f1099-divs fund (given ordinary $10,000 qualified $8,000 cap-gain $2,000))
-  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs dependents)
+  (empty f1099-ints f1099-bs f1099-gs f1099-rs f1098-es ssa1099s f1040scs people)
   (expect f1040/line9 $52,000
           f1040/line15 $36,250
           f1040-qdcg/line9 $10,000

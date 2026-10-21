@@ -5,9 +5,9 @@
 
 (def line3 :label "Modified adjusted gross income" f1040/line11a)  ; + 2d
 (def line4 :label "Qualifying children under 17 with an SSN"
-  (count dependents ctc-child))
+  (count people ctc-child))
 (def line5 (* line4 law/ctc-per-child))
-(def line6 :label "Other dependents" (count dependents odc-dependent))
+(def line6 :label "Other dependents" (count people odc-dependent))
 (def line7 (* line6 law/odc-per-dependent))
 (def line8 (+ line5 line7))
 (def line9 law/ctc-phaseout-start)
