@@ -60,7 +60,7 @@
 (def line13a :label "Qualified business income deduction" :line 13a :cite "IRC §199A"
   (cond ((= f8995/line10 $0) $0)
         ((<= f8995/line11 law/qbi-threshold) f8995/line15)
-        (else f8995a-deduction)))
+        (else f8995a/line39)))
 (def line14 :label "Total deductions" :line 14 (+ line12e line13a line13b))
 (def line15 :label "Taxable income" :line 15 :cite "IRC §63"
   (excess line11a line14))

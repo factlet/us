@@ -468,12 +468,6 @@
   :cite "IRC §199A(c)(2)")
 (input reit-ptp-loss-carryforward : usd :default $0
   :label "Qualified REIT dividends and PTP loss carried forward from last year" :line 7)
-; Above the threshold the deduction takes Form 8995-A, with its limits by
-; W-2 wages and property and its phaseout for a specified service
-; business, which isn't modeled: its result is asked for instead.
-(input f8995a-deduction : usd
-  :label "Qualified business income deduction from Form 8995-A"
-  :cite "IRC §199A(b)(2), (b)(3), (d)(3)")
 
 (module law (include "law/2025.lisp"))
 
@@ -509,6 +503,9 @@
 (module f8880 (include "forms/f8880.lisp"))
 (module f8962 (include "forms/f8962.lisp"))
 (module f8995 (include "forms/f8995.lisp"))
+(module f8995a (include "forms/f8995a.lisp"))
+(module f8995aa (include "forms/f8995aa.lisp"))
+(module f8995ac (include "forms/f8995ac.lisp"))
 (module f6251 (include "forms/f6251.lisp"))
 (module f8615 (include "forms/f8615.lisp"))
 (module f8615-ws1 (include "forms/f8615-ws1.lisp"))

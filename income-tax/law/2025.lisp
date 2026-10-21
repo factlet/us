@@ -163,6 +163,13 @@
 (def qbi-rate :cite "IRC §199A(a), (b)(1)" 20%)
 (def qbi-threshold :cite "IRC §199A(e)(2); Rev. Proc. 2024-40"
   (table filing-status married-joint $394,600 else $197,300))
+; Past the threshold, each business's 20% is limited to the greater of 50%
+; of its W-2 wages, or 25% of them and 2.5% of its property, phased in over
+; the range; a specified service business is phased out over it.
+(def qbi-phase-in-range :cite "IRC §199A(b)(3)(B), (d)(3)"
+  (table filing-status married-joint $100,000 else $50,000))
+(def qbi-wage-rate :cite "IRC §199A(b)(2)(B)(i)" 50%)
+(def qbi-wage-and-property-rates :cite "IRC §199A(b)(2)(B)(ii)" [25% 2.5%])
 
 ; ---- Credits ----
 

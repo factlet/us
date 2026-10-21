@@ -22,7 +22,7 @@ factlet eval main.lisp --set married=true f1040/line34
 | `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `people` you may claim, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
-| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f8615`, `f6251`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`, `f8615-ws1`, `f8615-ws3`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; `f8615-qdcg9` and `f8615-qdcg15`, `f1040-qdcg` again for Form 8615; and `f1040scs`, a collection of Schedules C, one for each business |
+| `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f8995`, `f8995a`, `f8995aa`, `f8995ac`, `f8615`, `f6251`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`, `f8615-ws1`, `f8615-ws3`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; `f8615-qdcg9` and `f8615-qdcg15`, `f1040-qdcg` again for Form 8615; and `f1040scs`, a collection of Schedules C, one for each business |
 | `tests/`              | Scenarios with hand-checked results                        |
 | `examples/`           | Sample answers for `eval` and `explain`                    |
 
@@ -154,8 +154,16 @@ factlet eval main.lisp --set married=true f1040/line34
   each Schedule C's profit, less its share of self-employment tax and the
   tips Schedule 1-A deducts for it, and of qualified REIT dividends, with
   last year's loss carryforwards. It's no more than 20% of taxable income
-  less net capital gain and qualified dividends. Above the $197,300
-  ($394,600 joint) threshold, the Form 8995-A amount is asked for.
+  less net capital gain and qualified dividends.
+- Form 8995-A, above the $197,300 ($394,600 joint) threshold, with a
+  column on each Schedule C. A business's 20% is limited to the greater
+  of 50% of its W-2 wages, or 25% of them plus 2.5% of its property's
+  unadjusted basis, phased in over the next $50,000 ($100,000 joint). A
+  specified service business counts by the applicable percentage over the
+  same range, and not at all past it (Schedule A). Losses, and last
+  year's, are netted against the other businesses' income in proportion
+  to it, which leaves a loss business's wages and property out (Schedule
+  C).
 - Schedule 8812: the child tax credit, the credit for other dependents, the
   phaseout, and the additional child tax credit (Parts II-A and II-B). This
   includes the identification number rules: a filer (one spouse on a joint
@@ -323,9 +331,8 @@ These give wrong answers for returns they affect, so they come first:
   REIT dividends: no rentals, farms, partnerships, S corporations or
   publicly traded partnerships, nor an agricultural cooperative's patrons.
   It isn't reduced by the self-employed health insurance or retirement
-  plan deductions. Above the threshold, Form 8995-A (the wage and property
-  limits, and the phaseout for a specified service business) isn't
-  modeled: its result is asked for instead.
+  plan deductions. Form 8995-A has no aggregation of businesses (Schedule
+  B), and W-2 wages and property are asked for, not figured.
 - The AMT makes only the adjustments above (lines 2a, 2g and 2i): not
   investment interest, tax refunds, depreciation, net operating losses,
   passive activities, small business stock or the rest of lines 2b–3. It
@@ -352,5 +359,4 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Form 8995-A, above the qualified business income threshold
-2. Tax year 2026 (Rev. Proc. 2025-32)
+1. Tax year 2026 (Rev. Proc. 2025-32)

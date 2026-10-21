@@ -61,7 +61,7 @@
           f8995/line2 $27,174.09                     ; $40,000 − $2,825.91 − $10,000
           f8995/line15 $5,434.818))
 
-(test "above the threshold, Form 8995-A's result is asked for"
+(test "above the threshold, Form 8995-A, where REIT dividends have no wage limit"
   (given you/birth-date 1990-05-01)
   (member w2s a (given wages $210,000 medicare-wages $210,000 withheld $0))
   (member f1099-divs reit (given ordinary $3,050 section-199a $3,050))
@@ -69,6 +69,65 @@
   (expect f8995/line11 $197,300                      ; at the threshold
           f1040/line13a $610)
   (member w2s b (given wages $1 medicare-wages $1 withheld $0))
-  (expect f1040/line13a ?)
-  (given f8995a-deduction $600)
-  (expect f1040/line13a $600))
+  (expect f8995a/line31 $610
+          f1040/line13a $610))
+
+(test "past the phase-in range, no more than 50% of the business's W-2 wages"
+  (given you/birth-date 1990-05-01)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
+  (member f1040scs shop
+    (given receipts $600,000 wages $100,000 w2-wages $100,000 ubia $0)
+    (expect f8995a-line10 $50,000 f8995a-line15 $50,000))
+  (expect f8995a/phase-in false
+          f1040/line13a $50,000))                    ; not 20% of its $482,386.43
+
+(test "or 25% of them plus 2.5% of its property, if more"
+  (given you/birth-date 1990-05-01)
+  (empty w2s f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
+  (member f1040scs shop
+    (given receipts $600,000 wages $100,000 w2-wages $100,000 ubia $2,000,000)
+    (expect f8995a-line10 $75,000))                  ; $25,000 + $50,000
+  (expect f1040/line13a $75,000))
+
+(test "within the phase-in range, only that share of the excess over the limit is lost"
+  ; Statutory employee income: qualified business income with no
+  ; self-employment tax.
+  (given you/birth-date 1990-05-01)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
+  (member w2s acme (given wages $198,050 medicare-wages $198,050 withheld $0))
+  (member f1040scs route
+    (given receipts $40,000 statutory-employee true w2-wages $0 ubia $0)
+    (expect f8995a-line3 $8,000 f8995a-line10 $0 f8995a-line26 $4,000))
+  (expect f8995a/line20 $222,300
+          f8995a/line24 0.5                          ; $25,000 of the $50,000
+          f1040/line13a $4,000))
+
+(test "a specified service business counts in part within the range, and not at all past it"
+  (given you/birth-date 1990-05-01)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
+  (member w2s acme (given wages $198,050 medicare-wages $198,050 withheld $0))
+  (member f1040scs practice
+    (given receipts $40,000 statutory-employee true specified-service true w2-wages $0 ubia $0)
+    (expect f8995aa-line11 $20,000))                 ; 50% of it
+  (expect f8995aa/line10 0.5
+          f1040/line13a $2,000)                      ; $4,000, half of it lost
+  (member w2s raise (given wages $30,000 medicare-wages $30,000 withheld $0))
+  (expect f8995aa/line10 0
+          f1040/line13a $0))
+
+(test "a business's loss nets against the others' income, and its wages don't count"
+  (given you/birth-date 1990-05-01)
+  (empty f1099-ints f1099-divs f1099-bs f1099-gs f1099-rs f1098-es ssa1099s people)
+  (member w2s acme
+    (given wages $300,000 medicare-wages $300,000 withheld $0 ss-wages $176,100
+           medicare-withheld $4,350))
+  (member f1040scs a (given receipts $100,000 w2-wages $20,000 ubia $0)
+    (expect f8995a-line10 $10,000 f8995a-line15 $10,000))
+  ; Not asked for its wages or property.
+  (member f1040scs b (given receipts $10,000 other-expenses $30,000)
+    (expect qbi -$20,000 f8995ac-line1c $0 f8995a-line15 $0))
+  (member f1040scs c (given receipts $100,000 w2-wages $0 ubia $0)
+    (expect f8995a-line15 $0))
+  (expect f8995ac/line5 $20,000
+          f8995ac/line6 $0
+          f1040/line13a $10,000))

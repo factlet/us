@@ -87,6 +87,49 @@
     (- line31 se-deduction
        (if (= tips-counted $0) $0 (* tips-counted f1040s1a/tips-deducted-rate))))
 
+  ; ---- Form 8995-A, its column ----
+
+  ; Above the threshold, a specified service business counts only by the
+  ; applicable percentage (Schedule A, lines 11–13).
+  (input specified-service : bool :default false
+    :label "A specified service business: in health, law, accounting, actuarial science, performing arts, consulting, athletics, financial or brokerage services, or investing, or reliant on its owners' reputation or skill"
+    :cite "IRC §199A(d)(2)")
+  (def sstb-share (if specified-service f8995aa/line10 1))
+  (def f8995aa-line11 :label "Qualified business income, as far as it counts" (* qbi sstb-share))
+  ; Schedule C (Form 8995-A): the losses, netted against the businesses
+  ; with income in proportion to it.
+  (def f8995ac-line1b :label "Reduction for loss netting"
+    (if (> f8995aa-line11 $0) (* f8995ac/line5 (/ f8995aa-line11 f8995ac/line4)) $0))
+  (def f8995ac-line1c :label "Adjusted qualified business income"
+    (max $0 (- f8995aa-line11 f8995ac-line1b)))
+  ; Its W-2 wages and property, asked only once it has income left.
+  (input w2-wages : usd
+    :label "W-2 wages it paid its employees, with their elective deferrals (Forms W-2, box 12, codes D, E, F, G and S)"
+    :cite "IRC §199A(b)(4)")
+  (input ubia : usd
+    :label "Unadjusted basis of its depreciable property in use at the end of the year, until the later of 10 years or its recovery period ends"
+    :cite "IRC §199A(b)(6)")
+  (def f8995a-line2 :label "Qualified business income" f8995ac-line1c)
+  (def f8995a-line3 (* law/qbi-rate f8995a-line2))
+  (def f8995a-line4 :label "W-2 wages"
+    (if (> f8995a-line2 $0) (* w2-wages sstb-share) $0))
+  (def f8995a-line7 :label "UBIA of qualified property"
+    (if (> f8995a-line2 $0) (* ubia sstb-share) $0))
+  (def f8995a-line10 :label "W-2 wage and UBIA limit" :cite "IRC §199A(b)(2)(B)"
+    (max (* law/qbi-wage-rate f8995a-line4)
+         (+ (* (nth law/qbi-wage-and-property-rates 0) f8995a-line4)
+            (* (nth law/qbi-wage-and-property-rates 1) f8995a-line7))))
+  (def f8995a-line11 (min f8995a-line3 f8995a-line10))
+  ; Part III: within the phase-in range, only that share of the excess over
+  ; the limit is lost.
+  (def f8995a-line19 (- f8995a-line3 f8995a-line10))
+  (def f8995a-line26 :label "After the phase-in reduction" :cite "IRC §199A(b)(3)(B)"
+    (- f8995a-line3 (* f8995a-line19 f8995a/line24)))
+  (def f8995a-line12 :label "Phased-in reduction"
+    (if (and f8995a/phase-in (< f8995a-line10 f8995a-line3)) f8995a-line26 $0))
+  (def f8995a-line13 (max f8995a-line11 f8995a-line12))
+  (def f8995a-line15 :label "Qualified business income component" f8995a-line13)  ; − 14
+
   ; ---- Part III: Cost of goods sold ----
 
   (input opening-inventory : usd :default $0 :label "Inventory at beginning of year" :line 35)
