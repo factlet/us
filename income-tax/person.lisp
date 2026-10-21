@@ -51,6 +51,12 @@
 (module f8889 (include "forms/f8889.lisp"))
 
 (module f1040sse (include "forms/f1040sse.lisp"))
+; The deductible part of self-employment tax per dollar of profit, to share
+; among this person's businesses by profit (Schedule 1-A, line 5).
+(def business-profit :label "Profit from businesses with self-employment income"
+  (sum f1040scs (if (or statutory-employee (!= spouses is-spouse)) $0 (max $0 line31))))
+(def se-deduction-rate
+  (if (= business-profit $0) 0 (/ f1040sse/line13 business-profit)))
 
 ; As a student, for an education credit (Form 8863, Part III, lines 23
 ; through 31), as for a dependent.

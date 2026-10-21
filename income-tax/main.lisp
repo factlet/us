@@ -161,7 +161,16 @@
   (input dependent-care : usd :default $0 :label "Dependent care benefits" :line 10)
   (input deferrals : usd :default $0
     :label "Elective deferrals to a 401(k) or other plan (box 12, codes D, E, F, G, S, AA, BB, EE)"
-    :line 12))
+    :line 12)
+  ; For Schedule 1-A. Tips count if paid by choice, in cash or by card, in
+  ; an occupation that customarily received them before 2025. Of overtime
+  ; paid at time-and-a-half, a third is the premium.
+  (input qualified-tips : usd :default $0
+    :label "Of the tips (box 7, or as reported on Forms 4070), those received in an occupation listed at IRS.gov/TippedOccupations"
+    :cite "IRC §224(d)")
+  (input qualified-overtime : usd :default $0
+    :label "Of the wages, overtime pay the Fair Labor Standards Act requires beyond your regular rate: the half of time-and-a-half"
+    :cite "IRC §225(c)"))
 
 (collection f1099-ints :label "Forms 1099-INT"
   (input interest : usd :label "Interest income" :line 1)
@@ -245,6 +254,18 @@
 ; qualified student loan you were legally obligated to pay.
 (collection f1098-es :label "Forms 1098-E"
   (input interest : usd :label "Student loan interest received by lender" :line 1))
+
+; Car loan interest, for Schedule 1-A: on a loan taken out after 2024 to buy
+; a new car, minivan, van, SUV, pickup or motorcycle under 14,000 pounds,
+; assembled in the United States and mostly for personal use, secured by a
+; first lien on it. Not a lease, nor a loan from a relative; a refinancing
+; counts up to the balance it paid off.
+(input vehicle-loan : bool :default false
+  :label "You or your spouse paid interest on a loan for a new vehicle bought after 2024 for personal use"
+  :cite "IRC §163(h)(4)(B), (D)")
+(collection vehicle-loans :label "Loans for new vehicles, each with the vehicle's VIN"
+  (input interest : usd :label "Interest paid or accrued for the year")
+  (input deducted : usd :default $0 :label "Of that, interest deducted on Schedule C, E or F"))
 
 (include "forms/f1040sc.lisp")
 

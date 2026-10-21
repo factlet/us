@@ -131,6 +131,25 @@
   (table filing-status married-joint $150,000 else $75,000))
 (def senior-phaseout-rate :cite "IRC §151(d)(5)(C)(ii)" 6%)
 
+; Qualified tips and overtime, and car loan interest, 2025 through 2028,
+; whether or not you itemize. Each limit comes down by $100 for each full
+; $1,000 of modified AGI over the threshold, or for car loan interest by
+; $200 for each $1,000 or part of it.
+(def tips-limit :cite "IRC §224(b)(1)" $25,000)
+(def tips-phaseout-start :cite "IRC §224(b)(2)(A)"
+  (table filing-status married-joint $300,000 else $150,000))
+(def tips-phaseout-reduction :cite "IRC §224(b)(2)(A)" $100)
+(def overtime-limit :cite "IRC §225(b)(1)"
+  (table filing-status married-joint $25,000 else $12,500))
+(def overtime-phaseout-start :cite "IRC §225(b)(2)(A)"
+  (table filing-status married-joint $300,000 else $150,000))
+(def overtime-phaseout-reduction :cite "IRC §225(b)(2)(A)" $100)
+(def car-loan-limit :cite "IRC §163(h)(4)(C)(i)" $10,000)
+(def car-loan-phaseout-start :cite "IRC §163(h)(4)(C)(ii)(I)"
+  (table filing-status married-joint $200,000 else $100,000))
+(def car-loan-phaseout-reduction :cite "IRC §163(h)(4)(C)(ii)(I)" $200)
+(def phaseout-step :cite "IRC §§224(b)(2)(A), 225(b)(2)(A), 163(h)(4)(C)(ii)(I)" $1,000)
+
 ; ---- Credits ----
 
 ; Child and dependent care: a share of up to $3,000 of expenses for one

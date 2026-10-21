@@ -19,7 +19,7 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 
 | Path                  | Holds                                                      |
 | --------------------- | ---------------------------------------------------------- |
-| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`); and the module for each form |
+| `main.lisp`           | Units, enums and shared helpers; the inputs: who is filing, `dependents`, and information returns (`w2s`, `f1099-ints`, `f1099-divs`, `f1099-bs`, `f1099-gs`, `f1099-rs`, `ssa1099s`, `f1098-es`, `f1095-as`), and `vehicle-loans`; and the module for each form |
 | `person.lisp`         | One filer's questions, included as `you/…` and `spouse/…`, each with their own Form 8889 and Schedule SE (`you/f8889`, `you/f1040sse`, and the spouse's)  |
 | `law/2025.lisp`       | Every amount and rate from the Code or IRS guidance, as `law/…` |
 | `forms/`              | One module per form or worksheet: `f1040`, `f1040s1`, `f1040s1a`, `f1040s2`, `f1040s3`, `f1040s8`, `f1040sa`, `f1040sd`, `f1040sse`, `f2441`, `f8863`, `f8880`, `f8889`, `f8962`, `f8959`, `f8960`, `f1040-qdcg`, `f1040-ssb`, `f1040-eic`, `f1040-eic-b`, `f1040sa-salt`, `f1040s1-ira`, `f1040s1-sli`; `p590a-ssb`, `f1040-ssb` again for Pub. 590-A; and `f1040scs`, a collection of Schedules C, one for each business |
@@ -117,7 +117,19 @@ factlet eval main.lisp --set "filing-status='single" f1040/line34
 - Tax from the Tax Table (the midpoint of each $25 or $50 row) below
   $100,000, the Tax Computation Worksheet from $100,000, and the Qualified
   Dividends and Capital Gain Tax Worksheet.
-- Schedule 1-A Part V: the enhanced deduction for seniors (2025–2028).
+- Schedule 1-A (2025–2028), deductions whether or not you itemize:
+  - qualified tips, up to $25,000, from W-2s and from businesses, a
+    business's only up to its profit less its share of its owner's
+    deductible self-employment tax
+  - the FLSA overtime premium from W-2s, up to $12,500 ($25,000 joint)
+  - interest on loans for new vehicles bought for personal use, up to
+    $10,000
+  - the enhanced deduction for seniors
+
+  Tips and overtime come down by $100 for each full $1,000 of modified AGI
+  over $150,000 ($300,000 joint), and need a valid SSN for whoever received
+  them and, if married, a joint return. Car loan interest comes down by
+  $200 for each $1,000 or part of it over $100,000 ($200,000 joint).
 - Schedule 8812: the child tax credit, the credit for other dependents, the
   phaseout, and the additional child tax credit (Parts II-A and II-B). This
   includes the identification number rules: a filer (one spouse on a joint
@@ -230,6 +242,14 @@ These give wrong answers for returns they affect, so they come first:
   marriage (Part V), or interact with the self-employed health insurance
   deduction. Household income under 100% of the poverty line is taken as
   eligible whenever advance payments were made.
+- Qualified tips are what you say they are: Form 4137's unreported tips
+  aren't added (Schedule 1-A line 4b), and an employee tipped in more than
+  one occupation for the same employer isn't asked which tips came from
+  which. Qualified overtime reported on Forms 1099-NEC or 1099-MISC (line
+  14b) isn't asked for. A business's net income for its tips subtracts
+  only its share of self-employment tax, not of the self-employed health
+  insurance or retirement plan deductions. Modified AGI doesn't add back
+  excluded foreign or territory income (line 2e).
 - Social security benefits that include a lump-sum payment for earlier
   years are all taxed this year: the lump-sum election (line 6c, Pub. 915)
   isn't offered.
@@ -240,10 +260,9 @@ These give wrong answers for returns they affect, so they come first:
 
 One commit each, in rough order of how many returns need them:
 
-1. Schedule 1-A Parts II–IV: tips, overtime and car loan interest
-2. Form 8995, the qualified business income deduction
-3. An EIC qualifying child who isn't your dependent (Form 8332)
-4. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
+1. Form 8995, the qualified business income deduction
+2. An EIC qualifying child who isn't your dependent (Form 8332)
+3. Deriving filing status (IRC §2) and dependents (IRC §152) from facts,
    instead of asking for them
-5. Form 8615 (kiddie tax) and Form 6251 (AMT)
-6. Tax year 2026 (Rev. Proc. 2025-32)
+4. Form 8615 (kiddie tax) and Form 6251 (AMT)
+5. Tax year 2026 (Rev. Proc. 2025-32)

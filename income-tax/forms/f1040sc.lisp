@@ -62,6 +62,11 @@
     (max $0 (min line29 (* (min home-office law/home-office-area) law/home-office-rate))))
   ; A loss is taken as all at risk (line 32a).
   (def line31 :label "Net profit or loss" (- line29 line30))
+  ; For Schedule 1-A: tips customers paid by choice, included in receipts
+  ; reported on Forms 1099-NEC, 1099-MISC or 1099-K.
+  (input qualified-tips : usd :default $0
+    :label "Of the receipts, tips received in an occupation listed at IRS.gov/TippedOccupations"
+    :cite "IRC §224(c), (d)")
 
   ; ---- Part III: Cost of goods sold ----
 
